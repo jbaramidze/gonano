@@ -10,11 +10,11 @@ import (
 	"github.com/jbaramidze/term_collab_editor/helper"
 )
 
-// ContentManager ss
-type ContentManager struct {
+// Display ss
+type Display struct {
 	data               *list.List // list of LinkedListElement
 	currentElement     *list.Element
-	display            *ScreenHandler
+	ScreenHandler      *ScreenHandler
 	currentX, currentY int
 	monitorChannel     chan ContentOperation
 	blinkIsSet         bool
@@ -25,7 +25,7 @@ type LinkedListElement struct {
 	startingCoordY int
 }
 
-func Initialize() ContentManager {
+func Initialize() Display {
 	d := InitScreen()
 
 	ch1 := make(chan ContentOperation)
@@ -38,9 +38,9 @@ func Initialize() ContentManager {
 	return cm
 }
 
-func (c *ContentManager) Poll() {
+func (c *Display) Poll() {
 	for {
-		switch ev := c.display.screen.PollEvent().(type) {
+		switch ev := c.ScreenHandler.screen.PollEvent().(type) {
 		case *tcell.EventKey:
 			if ev.Key() == tcell.KeyTAB {
 				return
@@ -50,11 +50,11 @@ func (c *ContentManager) Poll() {
 	}
 }
 
-func (c *ContentManager) Close() {
-	c.display.screen.Fini()
+func (c *Display) Close() {
+	c.ScreenHandler.screen.Fini()
 }
 
-func (c *ContentManager) startLoop() {
+func (c *Display) startLoop() {
 	for {
 		op := <-c.monitorChannel
 		c.clearBlinkStatus()
@@ -120,7 +120,7 @@ func (c *ContentManager) startLoop() {
 	}
 }
 
-func (c *ContentManager) refreshBlinkStatus() {
+func (c *Display) refreshBlinkStatus() {
 	if c.blinkIsSet {
 		c.setBlinkStatus()
 	} else {
@@ -128,36 +128,36 @@ func (c *ContentManager) refreshBlinkStatus() {
 	}
 }
 
-func (c *ContentManager) clearBlinkStatus() {
+func (c *Display) clearBlinkStatus() {
 	if len(c.currentElement.Value.([]rune)) > c.currentX {
-		c.display.putStr(c.currentX, c.currentY, rune(c.currentElement.Value.([]rune)[c.currentX]))
+		c.ScreenHandler.putStr(c.currentX, c.currentY, rune(c.currentElement.Value.([]rune)[c.currentX]))
 	} else {
-		c.display.putStr(c.currentX, c.currentY, rune(' '))
+		c.ScreenHandler.putStr(c.currentX, c.currentY, rune(' '))
 	}
 }
-func (c *ContentManager) setBlinkStatus() {
-	c.display.putStr(c.currentX, c.currentY, rune('▉'))
+func (c *Display) setBlinkStatus() {
+	c.ScreenHandler.putStr(c.currentX, c.currentY, rune('▉'))
 }
 
-func (c *ContentManager) newChar(char rune) {
+func (c *Display) newChar(char rune) {
 	logger.L.Log(fmt.Sprintf("Writing %v at %v:%v!", string(char), c.currentY, c.currentX))
 	text := c.currentElement.Value.([]rune)
 	text = append(append(text[:c.currentX], rune(char)), text[c.currentX:]...)
 	c.currentElement.Value = text
-	c.display.putStr(c.currentX, c.currentY, char)
+	c.ScreenHandler.putStr(c.currentX, c.currentY, char)
 	c.currentX++
 	c.refreshBlinkStatus()
 }
 
-func (c *ContentManager) resyncLine(line int) {
+func (c *Display) resyncLine(line int) {
 
 }
 
-func newContentManager(d *ScreenHandler, c chan ContentOperation) ContentManager {
+func newContentManager(s *ScreenHandler, c chan ContentOperation) Display {
 	l := list.New()
 	l.PushBack([]rune{})
 	current := l.Back()
-	cm := ContentManager{display: d, data: l, currentElement: current, monitorChannel: c}
+	cm := Display{ScreenHandler: s, data: l, currentElement: current, monitorChannel: c}
 	return cm
 }
 
