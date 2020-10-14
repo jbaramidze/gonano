@@ -12,7 +12,7 @@ type ScreenHandler struct {
 	screen tcell.Screen
 }
 
-func InitScreen() *ScreenHandler {
+func InitScreenHandler() (*ScreenHandler, chan ContentOperation) {
 	s, e := tcell.NewScreen()
 	if e != nil {
 		fmt.Fprintf(os.Stderr, "Error 1: %v\n", e)
@@ -28,7 +28,9 @@ func InitScreen() *ScreenHandler {
 		Foreground(tcell.ColorWhite)
 	s.SetStyle(defStyle)
 
-	return &ScreenHandler{screen: s}
+	channel := make(chan ContentOperation)
+
+	return &ScreenHandler{screen: s}, channel
 }
 
 func (d ScreenHandler) putStr(x, y int, b rune) {
