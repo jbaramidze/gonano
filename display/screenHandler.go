@@ -7,11 +7,12 @@ import (
 	"github.com/gdamore/tcell"
 )
 
-// Display Bla bla
+// ScreenHandler Bla bla
 type ScreenHandler struct {
 	screen tcell.Screen
 }
 
+// InitScreenHandler s
 func InitScreenHandler() (*ScreenHandler, chan ContentOperation) {
 	s, e := tcell.NewScreen()
 	if e != nil {

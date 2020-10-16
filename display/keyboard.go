@@ -5,59 +5,53 @@ import (
 	"github.com/jbaramidze/term_collab_editor/helper"
 )
 
+func (c *Display) syncCoords() {
+	blinkerX, blinkerY := c.getCurrentEl().getBlinkerCoords()
+	c.currentX = blinkerX
+	c.currentY = blinkerY + c.getCurrentEl().startingCoordY
+}
+
 func (c *Display) handleKeyPress(op TypeOperation) {
 	switch op.key {
 	case tcell.KeyLeft:
 		{
-			if c.currentX > 0 {
-				c.currentX--
-			}
+			c.getCurrentEl().moveLeft()
+			c.syncCoords()
 		}
 	case tcell.KeyRight:
 		{
-			if len(c.getCurrentEl().data) > c.currentX {
-				c.currentX++
-			}
+			c.getCurrentEl().moveRight()
+			c.syncCoords()
 		}
 	case tcell.KeyUp:
 		{
-			if c.currentY > 0 {
-				c.currentY--
-				if c.getCurrentEl().currentY > 0 {
-					c.getCurrentEl().currentY--
-				} else {
-					c.currentX = helper.MinOf(
-						c.currentX,
-						len(c.getCurrentEl().data),
-						len(c.getPrevEl().data))
-					c.currentElement = c.currentElement.Prev()
-				}
-
+			if c.hasPrevEl() {
+				pos := c.getCurrentEl().pos
+				c.currentElement = c.currentElement.Prev()
+				c.getCurrentEl().pos = helper.MinOf(c.getCurrentEl().pos, pos)
+				c.syncCoords()
 			}
 		}
 	case tcell.KeyDown:
 		{
-			if c.data.Len() > c.currentY+1 {
-				c.currentY++
-				c.currentX = helper.MinOf(
-					c.currentX,
-					len(c.getCurrentEl().data),
-					len(c.getNextEl().data))
+			if c.hasNextEl() {
+				pos := c.getCurrentEl().pos
 				c.currentElement = c.currentElement.Next()
+				c.getCurrentEl().pos = helper.MinOf(c.getCurrentEl().pos, pos)
+				c.syncCoords()
 			}
 		}
 	case tcell.KeyEnter:
 		{
 			cur := c.getCurrentEl()
-			newItem := Line{data: []rune{}, startingCoordY: cur.startingCoordY + cur.height, height: 1}
+			newItem := Line{data: []rune{}, startingCoordY: cur.startingCoordY + cur.height, height: 1, pos: 0, display: c}
 			c.data.InsertAfter(&newItem, c.currentElement)
 			c.currentElement = c.currentElement.Next()
-			c.currentX = 0
-			c.currentY++
+			c.syncCoords()
 		}
 	default:
 		{
-			c.newChar(op.rn)
+			c.getCurrentEl().insertCharInCurrentPosition(op.rn)
 		}
 	}
 }

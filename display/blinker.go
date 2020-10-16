@@ -1,6 +1,8 @@
 package display
 
-import "time"
+import (
+	"time"
+)
 
 func initAndStartBlinker(c chan ContentOperation) {
 	go func(c chan ContentOperation) {
@@ -23,8 +25,8 @@ func (d *Display) refreshBlinkStatus() {
 }
 
 func (d *Display) clearBlinkStatus() {
-	if len(d.getCurrentEl().data) > d.currentX {
-		d.ScreenHandler.putStr(d.currentX, d.currentY, rune(d.getCurrentEl().data[d.currentX]))
+	if len(d.getCurrentEl().data) > d.getCurrentEl().pos {
+		d.ScreenHandler.putStr(d.currentX, d.currentY, d.getCurrentEl().getCurrentChar())
 	} else {
 		d.ScreenHandler.putStr(d.currentX, d.currentY, rune(' '))
 	}

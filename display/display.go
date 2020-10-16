@@ -2,11 +2,6 @@ package display
 
 import (
 	"container/list"
-	"fmt"
-
-	"github.com/jbaramidze/term_collab_editor/helper"
-
-	"github.com/jbaramidze/term_collab_editor/logger"
 
 	"github.com/gdamore/tcell"
 )
@@ -30,15 +25,24 @@ func (c *Display) getCurrentEl() *Line {
 	return c.currentElement.Value.(*Line)
 }
 
+func (c *Display) hasPrevEl() bool {
+	return c.currentElement.Prev() != nil
+}
+
 func (c *Display) getPrevEl() *Line {
 	return c.currentElement.Prev().Value.(*Line)
+}
+
+func (c *Display) hasNextEl() bool {
+	return c.currentElement.Next() != nil
 }
 
 func (c *Display) getNextEl() *Line {
 	return c.currentElement.Next().Value.(*Line)
 }
 
-func Initialize() Display {
+// Initialize display
+func Initialize() *Display {
 	handler, channel := InitScreenHandler()
 
 	cm := newContentManager(handler, channel)
@@ -48,6 +52,7 @@ func Initialize() Display {
 	return cm
 }
 
+// Poll display
 func (c *Display) Poll() {
 	for {
 		switch ev := c.ScreenHandler.screen.PollEvent().(type) {
@@ -60,6 +65,7 @@ func (c *Display) Poll() {
 	}
 }
 
+// Close display
 func (c *Display) Close() {
 	c.ScreenHandler.screen.Fini()
 }
@@ -83,34 +89,12 @@ func (c *Display) startLoop() {
 	}
 }
 
-func (c *Display) newChar(char rune) {
-	logger.L.Log(fmt.Sprintf("Writing %v at %v:%v!", string(char), c.currentY, c.currentX))
-	c.getCurrentEl().data = helper.InsertInSlice(c.getCurrentEl().data, char, c.currentX)
-	logger.L.Log("Current string " + string(c.getCurrentEl().data))
-	c.resyncCurrentLine()
-	c.currentX++
-	if c.currentX == c.getWidth()-1 {
-		c.currentX = 0
-		c.currentY++
-	}
-}
-
-func (c *Display) resyncCurrentLine() {
-	usableWidth := c.getWidth() - 1
-	var line int
-	for i, r := range c.getCurrentEl().data {
-		line = i / usableWidth
-		c.ScreenHandler.putStr(i-(line*usableWidth), c.getCurrentEl().startingCoordY+line, r)
-	}
-	c.getCurrentEl().height = line + 1
-}
-
-func newContentManager(s *ScreenHandler, c chan ContentOperation) Display {
+func newContentManager(s *ScreenHandler, c chan ContentOperation) *Display {
 	lst := list.New()
 	d := Display{ScreenHandler: s, data: lst, monitorChannel: c}
 	lst.PushBack(d.newLine())
 	d.currentElement = lst.Back()
-	return d
+	return &d
 }
 
 // ContentOperation s

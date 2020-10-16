@@ -1,72 +1,338 @@
-Writing f at 0:0!
-Writing w at 0:1!
-Writing a at 0:2!
-Writing f at 0:3!
-Writing w at 0:4!
-Writing a at 0:5!
-Writing f at 1:0!
-Writing a at 1:1!
-Writing w at 1:2!
-Writing f at 1:3!
-Writing w at 1:4!
-Writing a at 1:5!
-Writing f at 1:6!
-Writing a at 1:7!
-Writing w at 1:8!
-Writing f at 1:9!
-Writing a at 1:10!
-Writing w at 1:11!
-Writing f at 0:4!
-Writing w at 0:5!
-Writing a at 0:6!
-Writing f at 0:7!
-Writing w at 0:8!
-Writing f at 1:9!
-Writing w at 1:10!
-Writing a at 1:11!
-Writing f at 1:12!
-Writing a at 1:13!
-Writing w at 1:14!
-Writing f at 1:15!
-Writing f at 0:11!
-Writing w at 0:12!
-Writing a at 0:13!
-Writing f at 0:14!
-Writing w at 0:15!
-Writing a at 0:16!
-Writing f at 0:17!
-Writing f at 1:18!
-Writing w at 1:19!
-Writing a at 1:20!
-Writing f at 1:21!
-Writing w at 1:22!
-Writing a at 1:23!
-Writing f at 1:24!
-Writing a at 1:25!
-Writing w at 1:26!
-Writing f at 1:27!
-Writing w at 1:28!
-Writing a at 1:29!
-Writing f at 1:30!
-Writing a at 1:31!
-Writing f at 0:18!
-Writing a at 0:19!
-Writing w at 0:20!
-Writing f at 0:21!
-Writing   at 0:22!
-Writing e at 0:23!
-Writing a at 0:24!
-Writing d at 0:25!
-Writing d at 0:26!
-Writing e at 0:27!
-Writing a at 0:28!
-Writing e at 1:29!
-Writing e at 1:30!
-Writing a at 1:31!
-Writing f at 1:26!
-Writing a at 1:27!
-Writing f at 1:28!
-Writing f at 1:29!
-Writing w at 1:30!
-Writing a at 1:31!
-Writing q at 1:31!
+Setting blink at 0:0
+Setting to 1
+Setting blink at 1:0
+Setting to 2
+Setting to 3
+Setting to 4
+Setting to 5
+Setting to 6
+Setting blink at 6:0
+Setting to 7
+Setting blink at 7:0
+Setting to 8
+Setting blink at 8:0
+Setting to 9
+Setting blink at 9:0
+Setting to 10
+Setting blink at 10:0
+Setting to 11
+Setting blink at 11:0
+Setting to 12
+Setting blink at 12:0
+Setting to 13
+Setting to 14
+Setting to 15
+Setting to 16
+Setting to 17
+Setting blink at 17:0
+Setting blink at 17:0
+Setting to 18
+Setting to 19
+Setting to 20
+Setting to 21
+Setting to 22
+Setting to 23
+Setting to 24
+Setting to 25
+Setting to 26
+Setting to 27
+Setting to 28
+Setting to 29
+Setting to 30
+Setting to 31
+Setting to 32
+Setting to 33
+Setting to 34
+Setting to 35
+Setting to 36
+Setting to 37
+Setting to 38
+Setting to 39
+Setting to 40
+Setting to 41
+Setting to 42
+Setting to 43
+Setting to 44
+Setting to 45
+Setting to 46
+Setting to 47
+Setting to 48
+Setting to 49
+Setting to 50
+Setting to 51
+Setting blink at 51:0
+Setting to 52
+Setting blink at 52:0
+Setting to 53
+Setting blink at 53:0
+Setting to 54
+Setting blink at 54:0
+Setting to 55
+Setting blink at 55:0
+Setting to 56
+Setting blink at 56:0
+Setting to 57
+Setting blink at 57:0
+Setting to 58
+Setting blink at 58:0
+Setting to 59
+Setting blink at 59:0
+Setting to 60
+Setting blink at 60:0
+Setting to 61
+Setting blink at 61:0
+Setting to 62
+Setting blink at 62:0
+Setting to 63
+Setting blink at 63:0
+Setting to 64
+Setting blink at 64:0
+Setting to 65
+Setting blink at 65:0
+Setting to 66
+Setting blink at 66:0
+Setting to 67
+Setting blink at 67:0
+Setting to 68
+Setting blink at 68:0
+Setting to 69
+Setting blink at 69:0
+Setting to 70
+Setting blink at 70:0
+Setting to 71
+Setting blink at 71:0
+Setting to 72
+Setting blink at 72:0
+Setting to 73
+Setting blink at 73:0
+Setting to 74
+Setting blink at 74:0
+Setting to 75
+Setting blink at 75:0
+Setting to 76
+Setting blink at 76:0
+Setting to 77
+Setting blink at 77:0
+Setting to 78
+Setting blink at 78:0
+Setting to 79
+Setting blink at 79:0
+Setting to 80
+Setting blink at 80:0
+Setting to 81
+Setting blink at 81:0
+Setting to 82
+Setting blink at 82:0
+Setting to 83
+Setting blink at 83:0
+Setting to 84
+Setting blink at 84:0
+Setting to 85
+Setting blink at 85:0
+Setting to 86
+Setting to 87
+Setting to 88
+Setting to 89
+Setting to 90
+Setting to 91
+Setting to 92
+Setting to 93
+Setting to 94
+Setting to 95
+Setting to 96
+Setting to 97
+Setting to 98
+Setting to 99
+Setting to 100
+Setting to 101
+Setting to 102
+Setting to 103
+Setting to 104
+Setting to 105
+Setting to 106
+Setting blink at 106:0
+Setting to 107
+Setting blink at 107:0
+Setting to 108
+Setting blink at 108:0
+Setting to 109
+Setting blink at 109:0
+Setting to 110
+Setting blink at 110:0
+Setting to 111
+Setting blink at 111:0
+Setting to 112
+Setting blink at 112:0
+Setting to 113
+Setting blink at 113:0
+Setting to 114
+Setting blink at 114:0
+Setting to 115
+Setting blink at 115:0
+Setting to 116
+Setting blink at 116:0
+Setting to 117
+Setting blink at 117:0
+Setting to 118
+Setting blink at 118:0
+Setting to 119
+Setting blink at 119:0
+Setting to 120
+Setting blink at 120:0
+Setting to 121
+Setting blink at 121:0
+Setting to 122
+Setting blink at 122:0
+Setting to 123
+Setting blink at 123:0
+Setting to 124
+Setting blink at 124:0
+Setting to 125
+Setting blink at 125:0
+Setting to 126
+Setting blink at 126:0
+Setting to 127
+Setting blink at 127:0
+Setting to 128
+Setting blink at 128:0
+Setting to 129
+Setting blink at 129:0
+Setting to 130
+Setting blink at 130:0
+Setting to 131
+Setting blink at 131:0
+Setting to 132
+Setting blink at 132:0
+Setting to 133
+Setting blink at 133:0
+Setting to 134
+Setting blink at 134:0
+Setting to 135
+Setting blink at 135:0
+Setting to 136
+Setting blink at 136:0
+Setting to 137
+Setting to 138
+Setting to 139
+Setting to 140
+Setting to 141
+Setting to 142
+Setting to 143
+Setting to 144
+Setting to 145
+Setting to 146
+Setting to 147
+Setting to 148
+Setting to 149
+Setting to 150
+Setting to 151
+Setting to 152
+Setting to 153
+Setting blink at 153:0
+Setting blink at 153:0
+Setting blink at 153:0
+Setting to 154
+Setting blink at 154:0
+Setting to 155
+Setting blink at 155:0
+Setting to 156
+Setting blink at 156:0
+Setting to 157
+Setting to 158
+Setting to 159
+Setting to 160
+Setting blink at 160:0
+Setting to 161
+Setting blink at 161:0
+Setting to 162
+Setting blink at 162:0
+Setting to 163
+Setting blink at 163:0
+Setting to 164
+Setting blink at 164:0
+Setting blink at 164:0
+Setting blink at 164:0
+Setting to 0
+Setting blink at 0:1
+Setting blink at 0:1
+Setting to 1
+Setting blink at 1:1
+Setting blink at 1:1
+Setting to 2
+Setting blink at 2:1
+Setting blink at 2:1
+Setting to 3
+Setting blink at 3:1
+Setting to 4
+Setting blink at 4:1
+Setting to 5
+Setting blink at 5:1
+Setting to 6
+Setting blink at 6:1
+Setting to 7
+Setting blink at 7:1
+Setting to 8
+Setting blink at 8:1
+Setting to 9
+Setting blink at 9:1
+Setting to 10
+Setting blink at 10:1
+Setting to 11
+Setting blink at 11:1
+Setting to 12
+Setting blink at 12:1
+Setting blink at 12:1
+Setting to 11
+Setting blink at 11:1
+Setting blink at 11:1
+Setting to 10
+Setting blink at 10:1
+Setting to 9
+Setting blink at 9:1
+Setting to 8
+Setting to 7
+Setting blink at 7:1
+Setting to 6
+Setting blink at 6:1
+Setting to 5
+Setting blink at 5:1
+Setting to 4
+Setting blink at 4:1
+Setting to 3
+Setting blink at 3:1
+Setting to 2
+Setting blink at 2:1
+Setting blink at 2:1
+Setting blink at 2:1
+Setting blink at 2:1
+Setting blink at 2:1
+Setting blink at 2:1
+Setting blink at 3:1
+Setting blink at 8:1
+Setting blink at 9:1
+Setting blink at 10:1
+Setting blink at 11:1
+Setting blink at 12:1
+Setting blink at 13:1
+Setting blink at 14:1
+Setting blink at 14:1
+Setting blink at 15:1
+Setting blink at 21:1
+Setting blink at 22:1
+Setting blink at 23:1
+Setting blink at 24:1
+Setting blink at 25:1
+Setting blink at 26:1
+Setting blink at 27:1
+Setting blink at 33:1
+Setting blink at 34:1
+Setting blink at 35:1
+Setting blink at 36:1
+Setting blink at 36:1
+Setting to 3
+Setting blink at 3:1
+Setting blink at 3:1
+Setting blink at 3:1
+Setting blink at 3:1
+Setting blink at 3:1
+Setting blink at 3:1

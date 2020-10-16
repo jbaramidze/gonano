@@ -1,8 +1,6 @@
 package main
 
-import (
-	"github.com/jbaramidze/term_collab_editor/display"
-)
+import "github.com/jbaramidze/term_collab_editor/display"
 
 func main() {
 	cm := display.Initialize()

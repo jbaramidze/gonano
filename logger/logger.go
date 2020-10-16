@@ -13,6 +13,7 @@ type Logger struct {
 	f *os.File
 }
 
+// Log to log file
 func (l Logger) Log(s string) {
 	l.f.WriteString(s + "\n")
 }
