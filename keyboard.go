@@ -1,8 +1,7 @@
-package display
+package main
 
 import (
 	"github.com/gdamore/tcell"
-	"github.com/jbaramidze/term_collab_editor/helper"
 )
 
 func (c *Display) syncCoords() {
@@ -28,7 +27,7 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 			if c.hasPrevEl() {
 				pos := c.getCurrentEl().pos
 				c.currentElement = c.currentElement.Prev()
-				c.getCurrentEl().pos = helper.MinOf(c.getCurrentEl().pos, pos)
+				c.getCurrentEl().pos = minOf(c.getCurrentEl().pos, pos)
 				c.syncCoords()
 			}
 		}
@@ -37,7 +36,7 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 			if c.hasNextEl() {
 				pos := c.getCurrentEl().pos
 				c.currentElement = c.currentElement.Next()
-				c.getCurrentEl().pos = helper.MinOf(c.getCurrentEl().pos, pos)
+				c.getCurrentEl().pos = minOf(c.getCurrentEl().pos, pos)
 				c.syncCoords()
 			}
 		}

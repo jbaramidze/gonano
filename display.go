@@ -1,4 +1,4 @@
-package display
+package main
 
 import (
 	"container/list"
@@ -41,8 +41,7 @@ func (c *Display) getNextEl() *Line {
 	return c.currentElement.Next().Value.(*Line)
 }
 
-// Initialize display
-func Initialize() *Display {
+func createDisplay() *Display {
 	handler, channel := InitScreenHandler()
 
 	cm := newContentManager(handler, channel)
@@ -52,8 +51,7 @@ func Initialize() *Display {
 	return cm
 }
 
-// Poll display
-func (c *Display) Poll() {
+func (c *Display) poll() {
 	for {
 		switch ev := c.ScreenHandler.screen.PollEvent().(type) {
 		case *tcell.EventKey:

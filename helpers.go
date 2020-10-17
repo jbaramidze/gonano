@@ -1,6 +1,6 @@
-package helper
+package main
 
-func MinOf(vars ...int) int {
+func minOf(vars ...int) int {
 	min := vars[0]
 
 	for _, i := range vars {
@@ -12,7 +12,7 @@ func MinOf(vars ...int) int {
 	return min
 }
 
-func InsertInSlice(arr []rune, p rune, i int) []rune {
+func insertInSlice(arr []rune, p rune, i int) []rune {
 	arr1 := append(arr, 0)
 	copy(arr1[i+1:], arr1[i:])
 	arr1[i] = p

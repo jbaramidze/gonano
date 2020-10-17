@@ -1,8 +1,4 @@
-package display
-
-import (
-	"github.com/jbaramidze/term_collab_editor/helper"
-)
+package main
 
 // Line structure
 type Line struct {
@@ -46,7 +42,7 @@ func (l *Line) getBlinkerCoords() (int, int) {
 }
 
 func (l *Line) insertCharInCurrentPosition(char rune) {
-	l.data = helper.InsertInSlice(l.data, char, l.pos)
+	l.data = insertInSlice(l.data, char, l.pos)
 	l.pos++
 
 	l.resyncCurrentLine()
