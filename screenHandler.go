@@ -11,5 +11,6 @@ type screenHandler interface {
 
 type event struct {
 	rn rune
-	k  tcell.Key
+	// Instead copy-pasting and mapping all constants....
+	k tcell.Key
 }

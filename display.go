@@ -50,11 +50,8 @@ func (c *Display) getNextEl() *Line {
 	return c.currentElement.Next().Value.(*Line)
 }
 
-func createDisplay() *Display {
-
+func createDisplay(handler screenHandler) *Display {
 	channel := make(chan ContentOperation)
-	handler := initPhysicalScreenHandler()
-
 	d := initializeDisplay(handler, channel)
 	go d.startLoop()
 

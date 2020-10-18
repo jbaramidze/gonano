@@ -1,7 +1,8 @@
 package main
 
 func main() {
-	display := createDisplay()
+	handler := initPhysicalScreenHandler()
+	display := createDisplay(handler)
 	defer display.Close()
 
 	display.poll()
