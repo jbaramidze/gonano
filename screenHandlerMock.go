@@ -22,9 +22,10 @@ func (s *mockScreenHandler) pollKeyPress() event {
 
 func initMockScreenHandler() screenHandler {
 	data := make([][]rune, 4)
+	c := make(chan event)
 
 	for i := range data {
 		data[i] = make([]rune, 4)
 	}
-	return &mockScreenHandler{data: data}
+	return &mockScreenHandler{data: data, keyChan: c}
 }

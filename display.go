@@ -14,7 +14,7 @@ type Display struct {
 	screen             screenHandler
 	currentX, currentY int
 	monitorChannel     chan ContentOperation
-	blinkIsSet         bool
+	blinker            blinker
 }
 
 func (c *Display) dump() {
@@ -53,13 +53,15 @@ func (c *Display) getNextEl() *Line {
 func createDisplay(handler screenHandler) *Display {
 	channel := make(chan ContentOperation)
 	d := initializeDisplay(handler, channel)
-	go d.startLoop()
 
-	initAndStartBlinker(channel)
 	return d
 }
 
-func (c *Display) poll() {
+func (c *Display) setBlinker(b blinker) {
+	c.blinker = b
+}
+
+func (c *Display) pollKeyboard() {
 	for {
 		ev := c.screen.pollKeyPress()
 		if ev.k == tcell.KeyTAB {
@@ -77,17 +79,16 @@ func (c *Display) Close() {
 func (c *Display) startLoop() {
 	for {
 		op := <-c.monitorChannel
-		c.clearBlinkStatus()
+		c.blinker.clear()
 		switch decoded := op.(type) {
 		case TypeOperation:
 			{
 				c.handleKeyPress(decoded)
-				c.refreshBlinkStatus()
+				c.blinker.refresh()
 			}
 		case BlinkOperation:
 			{
-				c.blinkIsSet = decoded.blink
-				c.refreshBlinkStatus()
+				c.blinker.refresh()
 			}
 		}
 	}

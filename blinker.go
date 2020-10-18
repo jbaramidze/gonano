@@ -4,33 +4,76 @@ import (
 	"time"
 )
 
-func initAndStartBlinker(c chan ContentOperation) {
+type blinker interface {
+	refresh()
+	set()
+	clear()
+}
+
+type realBlinker struct {
+	blinkIsSet bool
+	d          *Display
+}
+
+func (r *realBlinker) refresh() {
+	if r.blinkIsSet {
+		r.set()
+	} else {
+		r.clear()
+	}
+}
+
+func (r *realBlinker) set() {
+	r.d.screen.putStr(r.d.currentX, r.d.currentY, rune('▉'))
+}
+
+func (r *realBlinker) clear() {
+	if len(r.d.getCurrentEl().data) > r.d.getCurrentEl().pos {
+		r.d.screen.putStr(r.d.currentX, r.d.currentY, r.d.getCurrentEl().getCurrentChar())
+	} else {
+		r.d.screen.putStr(r.d.currentX, r.d.currentY, rune(' '))
+	}
+}
+
+func initRealBlinker(d *Display) blinker {
+	b := &realBlinker{d: d, blinkIsSet: false}
 	go func(c chan ContentOperation) {
 		ticker := time.NewTicker(500 * time.Millisecond)
-		init := false
 		for {
-			init = !init
 			<-ticker.C
-			c <- BlinkOperation{blink: init}
+			b.blinkIsSet = !b.blinkIsSet
+			c <- BlinkOperation{blink: b.blinkIsSet}
 		}
-	}(c)
+	}(d.monitorChannel)
+
+	return b
 }
 
-func (d *Display) refreshBlinkStatus() {
-	if d.blinkIsSet {
-		d.setBlinkStatus()
-	} else {
-		d.clearBlinkStatus()
-	}
+type mockBlinker struct {
+	rb    realBlinker
+	ticks chan bool
 }
 
-func (d *Display) clearBlinkStatus() {
-	if len(d.getCurrentEl().data) > d.getCurrentEl().pos {
-		d.screen.putStr(d.currentX, d.currentY, d.getCurrentEl().getCurrentChar())
-	} else {
-		d.screen.putStr(d.currentX, d.currentY, rune(' '))
-	}
+func (b *mockBlinker) refresh() {
+	b.rb.refresh()
 }
-func (d *Display) setBlinkStatus() {
-	d.screen.putStr(d.currentX, d.currentY, rune('▉'))
+func (b *mockBlinker) set() {
+	b.rb.set()
+}
+func (b *mockBlinker) clear() {
+	b.rb.clear()
+}
+
+func initMockBlinker(d *Display) blinker {
+	ticker := make(chan bool)
+	b := &realBlinker{d: d, blinkIsSet: false}
+	go func(c chan ContentOperation) {
+		for {
+			<-ticker
+			b.blinkIsSet = !b.blinkIsSet
+			c <- BlinkOperation{blink: b.blinkIsSet}
+		}
+	}(d.monitorChannel)
+
+	return b
 }
