@@ -54,7 +54,7 @@ func (l *Line) resyncCurrentLine() {
 	var line int
 	for i, r := range l.data {
 		line = i / usableWidth
-		l.display.ScreenHandler.putStr(i-(line*usableWidth), l.startingCoordY+line, r)
+		l.display.screen.putStr(i-(line*usableWidth), l.startingCoordY+line, r)
 	}
 	l.height = line + 1
 }

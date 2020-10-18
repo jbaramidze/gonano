@@ -27,7 +27,7 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 			if c.hasPrevEl() {
 				pos := c.getCurrentEl().pos
 				c.currentElement = c.currentElement.Prev()
-				c.getCurrentEl().pos = minOf(c.getCurrentEl().pos, pos)
+				c.getCurrentEl().pos = minOf(len(c.getCurrentEl().data), pos)
 				c.syncCoords()
 			}
 		}
@@ -36,7 +36,7 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 			if c.hasNextEl() {
 				pos := c.getCurrentEl().pos
 				c.currentElement = c.currentElement.Next()
-				c.getCurrentEl().pos = minOf(c.getCurrentEl().pos, pos)
+				c.getCurrentEl().pos = minOf(len(c.getCurrentEl().data), pos)
 				c.syncCoords()
 			}
 		}
@@ -47,6 +47,10 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 			c.data.InsertAfter(&newItem, c.currentElement)
 			c.currentElement = c.currentElement.Next()
 			c.syncCoords()
+		}
+	case tcell.KeyCtrlF:
+		{
+			c.dump()
 		}
 	default:
 		{

@@ -26,11 +26,11 @@ func (d *Display) refreshBlinkStatus() {
 
 func (d *Display) clearBlinkStatus() {
 	if len(d.getCurrentEl().data) > d.getCurrentEl().pos {
-		d.ScreenHandler.putStr(d.currentX, d.currentY, d.getCurrentEl().getCurrentChar())
+		d.screen.putStr(d.currentX, d.currentY, d.getCurrentEl().getCurrentChar())
 	} else {
-		d.ScreenHandler.putStr(d.currentX, d.currentY, rune(' '))
+		d.screen.putStr(d.currentX, d.currentY, rune(' '))
 	}
 }
 func (d *Display) setBlinkStatus() {
-	d.ScreenHandler.putStr(d.currentX, d.currentY, rune('▉'))
+	d.screen.putStr(d.currentX, d.currentY, rune('▉'))
 }

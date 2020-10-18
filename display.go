@@ -2,6 +2,7 @@ package main
 
 import (
 	"container/list"
+	"log"
 
 	"github.com/gdamore/tcell"
 )
@@ -10,14 +11,22 @@ import (
 type Display struct {
 	data               *list.List // list of *Line
 	currentElement     *list.Element
-	ScreenHandler      *ScreenHandler
+	screen             screenHandler
 	currentX, currentY int
 	monitorChannel     chan ContentOperation
 	blinkIsSet         bool
 }
 
+func (c *Display) dump() {
+	log.Println("Dumping lines:")
+	for i, e := 0, c.data.Front(); e != nil; i, e = i+1, e.Next() {
+		l := e.Value.(*Line)
+		log.Printf("Line %v: data %v startY %v height %v pos %v", i, string(l.data), l.startingCoordY, l.height, l.pos)
+	}
+}
+
 func (c *Display) getWidth() int {
-	w, _ := c.ScreenHandler.screen.Size()
+	w, _ := c.screen.getSize()
 	return w
 }
 
@@ -42,30 +51,30 @@ func (c *Display) getNextEl() *Line {
 }
 
 func createDisplay() *Display {
-	handler, channel := InitScreenHandler()
 
-	cm := newContentManager(handler, channel)
-	go cm.startLoop()
+	channel := make(chan ContentOperation)
+	handler := initPhysicalScreenHandler()
+
+	d := initializeDisplay(handler, channel)
+	go d.startLoop()
 
 	initAndStartBlinker(channel)
-	return cm
+	return d
 }
 
 func (c *Display) poll() {
 	for {
-		switch ev := c.ScreenHandler.screen.PollEvent().(type) {
-		case *tcell.EventKey:
-			if ev.Key() == tcell.KeyTAB {
-				return
-			}
-			c.monitorChannel <- TypeOperation{rn: ev.Rune(), key: ev.Key()}
+		ev := c.screen.pollKeyPress()
+		if ev.k == tcell.KeyTAB {
+			return
 		}
+		c.monitorChannel <- TypeOperation{rn: ev.rn, key: ev.k}
 	}
 }
 
 // Close display
 func (c *Display) Close() {
-	c.ScreenHandler.screen.Fini()
+	c.screen.close()
 }
 
 func (c *Display) startLoop() {
@@ -87,9 +96,9 @@ func (c *Display) startLoop() {
 	}
 }
 
-func newContentManager(s *ScreenHandler, c chan ContentOperation) *Display {
+func initializeDisplay(s screenHandler, c chan ContentOperation) *Display {
 	lst := list.New()
-	d := Display{ScreenHandler: s, data: lst, monitorChannel: c}
+	d := Display{screen: s, data: lst, monitorChannel: c}
 	lst.PushBack(d.newLine())
 	d.currentElement = lst.Back()
 	return &d
