@@ -61,9 +61,23 @@ func expectData(ctx context, data [][]rune) {
 	}
 }
 
-func expectPosition(ctx context, x int, y int) {
+func expectPositionOnScreen(ctx context, x int, y int) {
 	if ctx.d.currentX != x || ctx.d.currentY != y {
 		ctx.t.Errorf("Incorrect coords (%v, %v) vs (%v, %v)", ctx.d.currentX, ctx.d.currentY, x, y)
+	}
+}
+
+func expectLineAndPosition(ctx context, line int, pos int) {
+	firstLine := ctx.d.data.Front()
+	for i := 0; i < line; i++ {
+		firstLine = firstLine.Next()
+	}
+	if firstLine.Value != ctx.d.getCurrentEl() {
+		ctx.t.Errorf("Incorrect line %v", line)
+	}
+
+	if ctx.d.getCurrentEl().pos != pos {
+		ctx.t.Errorf("Incorrect pos %v vs %v", ctx.d.getCurrentEl().pos, pos)
 	}
 }
 
@@ -72,40 +86,73 @@ func TestIntMinBasic(t *testing.T) {
 	h, d := initDisplay(resp)
 	ctx := context{h: h, resp: resp, t: t, d: d}
 
-	expectPosition(ctx, 0, 0)
+	expectPositionOnScreen(ctx, 0, 0)
 
+	// Test typing on line, overflowing
 	sendChar(ctx, 97)
 	expectScreen(ctx, [][]rune{{97, 0, 0, 0}, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{97}})
-	expectPosition(ctx, 1, 0)
+	expectPositionOnScreen(ctx, 1, 0)
 
 	sendChar(ctx, 98)
 	expectScreen(ctx, [][]rune{{97, 98, 0, 0}, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{97, 98}})
-	expectPosition(ctx, 2, 0)
+	expectPositionOnScreen(ctx, 2, 0)
+	expectLineAndPosition(ctx, 0, 2)
 
 	sendChar(ctx, 99)
 	expectScreen(ctx, [][]rune{{97, 98, 99, 0}, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{97, 98, 99}})
-	expectPosition(ctx, 3, 0)
+	expectPositionOnScreen(ctx, 3, 0)
 
 	sendChar(ctx, 100)
 	expectScreen(ctx, [][]rune{{97, 98, 99, 100}, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{97, 98, 99, 100}})
-	expectPosition(ctx, 0, 1)
+	expectPositionOnScreen(ctx, 0, 1)
 
 	sendChar(ctx, 101)
 	expectScreen(ctx, [][]rune{{97, 98, 99, 100}, {101, 0, 0, 0}, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{97, 98, 99, 100, 101}})
-	expectPosition(ctx, 1, 1)
+	expectPositionOnScreen(ctx, 1, 1)
 
+	// Test newline on last line
 	sendKey(ctx, tcell.KeyEnter)
 	expectScreen(ctx, [][]rune{{97, 98, 99, 100}, {101, 0, 0, 0}, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{97, 98, 99, 100, 101}, {}})
-	expectPosition(ctx, 0, 2)
+	expectPositionOnScreen(ctx, 0, 2)
 
 	sendChar(ctx, 102)
-	expectScreen(ctx, [][]rune{{97, 98, 99, 100}, {101, 0, 0, 0}, {102, 0, 0, 0}, emptyRow})
-	expectData(ctx, [][]rune{{97, 98, 99, 100, 101}, {102}})
-	expectPosition(ctx, 1, 2)
+	sendChar(ctx, 103)
+	sendChar(ctx, 104)
+	expectScreen(ctx, [][]rune{{97, 98, 99, 100}, {101, 0, 0, 0}, {102, 103, 104, 0}, emptyRow})
+	expectData(ctx, [][]rune{{97, 98, 99, 100, 101}, {102, 103, 104}})
+	expectPositionOnScreen(ctx, 3, 2)
+	expectLineAndPosition(ctx, 1, 3)
+
+	/*
+	  T E S T   A R R O W S
+	*/
+	// Up - takes us to previous, longer line
+	sendKey(ctx, tcell.KeyUp)
+	expectPositionOnScreen(ctx, 3, 0)
+	expectLineAndPosition(ctx, 0, 3)
+	// Up - first line, cannot go further
+	sendKey(ctx, tcell.KeyUp)
+	expectPositionOnScreen(ctx, 3, 0)
+	expectLineAndPosition(ctx, 0, 3)
+	// Right - jump to next line
+	sendKey(ctx, tcell.KeyRight)
+	expectPositionOnScreen(ctx, 0, 1)
+	// Right - regular
+	sendKey(ctx, tcell.KeyRight)
+	expectPositionOnScreen(ctx, 1, 1)
+	// Right - last char, cannot go further
+	sendKey(ctx, tcell.KeyRight)
+	expectPositionOnScreen(ctx, 1, 1)
+	expectLineAndPosition(ctx, 0, 5)
+	// Down - takes us to next, shorter line
+	sendKey(ctx, tcell.KeyDown)
+	expectPositionOnScreen(ctx, 3, 2)
+	expectLineAndPosition(ctx, 1, 3)
+
 }
