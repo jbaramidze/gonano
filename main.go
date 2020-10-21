@@ -10,5 +10,5 @@ func main() {
 	go display.startLoop()
 	defer display.Close()
 
-	display.pollKeyboard()
+	display.pollKeyboard(nil)
 }

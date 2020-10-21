@@ -51,8 +51,7 @@ func (c *Display) getNextEl() *Line {
 }
 
 func createDisplay(handler screenHandler) *Display {
-	channel := make(chan ContentOperation)
-	d := initializeDisplay(handler, channel)
+	d := initializeDisplay(handler)
 
 	return d
 }
@@ -61,13 +60,13 @@ func (c *Display) setBlinker(b blinker) {
 	c.blinker = b
 }
 
-func (c *Display) pollKeyboard() {
+func (c *Display) pollKeyboard(resp chan bool) {
 	for {
 		ev := c.screen.pollKeyPress()
 		if ev.k == tcell.KeyTAB {
 			return
 		}
-		c.monitorChannel <- TypeOperation{rn: ev.rn, key: ev.k}
+		c.monitorChannel <- TypeOperation{rn: ev.rn, key: ev.k, resp: resp}
 	}
 }
 
@@ -85,6 +84,9 @@ func (c *Display) startLoop() {
 			{
 				c.handleKeyPress(decoded)
 				c.blinker.refresh()
+				if decoded.resp != nil {
+					decoded.resp <- true
+				}
 			}
 		case BlinkOperation:
 			{
@@ -94,9 +96,10 @@ func (c *Display) startLoop() {
 	}
 }
 
-func initializeDisplay(s screenHandler, c chan ContentOperation) *Display {
+func initializeDisplay(s screenHandler) *Display {
+	channel := make(chan ContentOperation)
 	lst := list.New()
-	d := Display{screen: s, data: lst, monitorChannel: c}
+	d := Display{screen: s, data: lst, monitorChannel: channel}
 	lst.PushBack(d.newLine())
 	d.currentElement = lst.Back()
 	return &d
@@ -107,8 +110,9 @@ type ContentOperation interface{}
 
 // TypeOperation ss
 type TypeOperation struct {
-	rn  rune
-	key tcell.Key
+	rn   rune
+	key  tcell.Key
+	resp chan bool
 }
 
 // BlinkOperation ss

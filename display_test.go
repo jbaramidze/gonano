@@ -7,7 +7,7 @@ import (
 
 var emptyRow []rune = []rune{0, 0, 0, 0}
 
-func initDisplay() *mockScreenHandler {
+func initDisplay(resp chan bool) *mockScreenHandler {
 	handler := initMockScreenHandler()
 	display := createDisplay(handler)
 
@@ -17,23 +17,36 @@ func initDisplay() *mockScreenHandler {
 	go display.startLoop()
 	defer display.Close()
 
-	go display.pollKeyboard()
+	go display.pollKeyboard(resp)
 
 	return handler.(*mockScreenHandler)
 }
 
-// func maybeLate(arg func(a ...interface{}) bool) {
-// 	for i := 0; i < 5; i++ {
-// 		if arg() {
-// 			return true
-// 		}
-// 	}
-// }
+type context struct {
+	h    *mockScreenHandler
+	resp chan bool
+	t    *testing.T
+}
+
+func sendChar(ctx context, c rune) {
+	ctx.h.keyChan <- event{rn: c}
+	<-ctx.resp
+}
+
+func expect(ctx context, data [][]rune) {
+	if !reflect.DeepEqual(ctx.h.data, data) {
+		ctx.t.Errorf("Display content is wrong in [A]: %v", ctx.h.data)
+	}
+}
 
 func TestIntMinBasic(t *testing.T) {
-	h := initDisplay()
-	h.keyChan <- event{rn: 97}
-	if !reflect.DeepEqual(h.data, [][]rune{{97, 32, 0, 0}, emptyRow, emptyRow, emptyRow}) {
-		t.Errorf("Display content is wrong in [A]: %v", h.data)
-	}
+	resp := make(chan bool)
+	h := initDisplay(resp)
+	ctx := context{h: h, resp: resp, t: t}
+
+	sendChar(ctx, 97)
+	expect(ctx, [][]rune{{97, 32, 0, 0}, emptyRow, emptyRow, emptyRow})
+
+	sendChar(ctx, 98)
+	expect(ctx, [][]rune{{97, 98, 32, 0}, emptyRow, emptyRow, emptyRow})
 }
