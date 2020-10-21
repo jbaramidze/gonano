@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/gdamore/tcell"
 )
 
@@ -42,6 +44,7 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 		}
 	case tcell.KeyEnter:
 		{
+			log.Print("Enter pressed")
 			cur := c.getCurrentEl()
 			newItem := Line{data: []rune{}, startingCoordY: cur.startingCoordY + cur.height, height: 1, pos: 0, display: c}
 			c.data.InsertAfter(&newItem, c.currentElement)
@@ -54,6 +57,7 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 		}
 	default:
 		{
+			log.Print("Key pressed", op.key)
 			c.getCurrentEl().insertCharInCurrentPosition(op.rn)
 		}
 	}

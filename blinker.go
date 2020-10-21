@@ -31,7 +31,7 @@ func (r *realBlinker) clear() {
 	if len(r.d.getCurrentEl().data) > r.d.getCurrentEl().pos {
 		r.d.screen.putStr(r.d.currentX, r.d.currentY, r.d.getCurrentEl().getCurrentChar())
 	} else {
-		r.d.screen.putStr(r.d.currentX, r.d.currentY, rune(' '))
+		r.d.screen.putStr(r.d.currentX, r.d.currentY, rune(0))
 	}
 }
 
