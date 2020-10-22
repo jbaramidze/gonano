@@ -45,11 +45,15 @@ func (l *Line) insertCharInCurrentPosition(char rune) {
 	l.data = insertInSlice(l.data, char, l.pos)
 	l.pos++
 
-	l.resyncCurrentLine()
+	l.resync()
 	l.display.syncCoords()
 }
 
-func (l *Line) resyncCurrentLine() {
+func (l *Line) getCurrentY() int {
+	return 1 + l.pos/l.display.getWidth()
+}
+
+func (l *Line) resync() {
 	usableWidth := l.display.getWidth()
 	var line int
 	for i, r := range l.data {
@@ -57,4 +61,15 @@ func (l *Line) resyncCurrentLine() {
 		l.display.screen.putStr(i-(line*usableWidth), l.startingCoordY+line, r)
 	}
 	l.height = line + 1
+	// Clear the rest
+	idx := 0
+	for i := 0; i < l.height; i++ {
+		for j := 0; j < usableWidth; j++ {
+			idx++
+			if idx <= len(l.data) {
+				continue
+			}
+			l.display.screen.putStr(j, l.startingCoordY+i, 0)
+		}
+	}
 }

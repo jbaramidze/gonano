@@ -21,7 +21,7 @@ func (s *mockScreenHandler) pollKeyPress() event {
 }
 
 func initMockScreenHandler() screenHandler {
-	data := make([][]rune, 4)
+	data := make([][]rune, 6)
 	c := make(chan event)
 
 	for i := range data {

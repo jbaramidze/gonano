@@ -44,10 +44,12 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 		}
 	case tcell.KeyEnter:
 		{
-			log.Print("Enter pressed")
 			cur := c.getCurrentEl()
-			newItem := Line{data: []rune{}, startingCoordY: cur.startingCoordY + cur.height, height: 1, pos: 0, display: c}
+			newItem := Line{data: cur.data[cur.pos:], startingCoordY: cur.startingCoordY + cur.getCurrentY(), height: 1, pos: 0, display: c}
+			cur.data = cur.data[:cur.pos]
 			c.data.InsertAfter(&newItem, c.currentElement)
+			cur.resync()
+			newItem.resync()
 			c.currentElement = c.currentElement.Next()
 			c.syncCoords()
 		}

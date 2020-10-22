@@ -81,50 +81,50 @@ func expectLineAndPosition(ctx context, line int, pos int) {
 	}
 }
 
-func TestIntMinBasic(t *testing.T) {
+func TestBasic1(t *testing.T) {
 	resp := make(chan bool)
 	h, d := initDisplay(resp)
 	ctx := context{h: h, resp: resp, t: t, d: d}
 
 	expectPositionOnScreen(ctx, 0, 0)
 
-	// Test typing on line, overflowing
+	// Test typing at the end of line, overflowing
 	sendChar(ctx, 97)
-	expectScreen(ctx, [][]rune{{97, 0, 0, 0}, emptyRow, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{97, 0, 0, 0}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{97}})
 	expectPositionOnScreen(ctx, 1, 0)
 
 	sendChar(ctx, 98)
-	expectScreen(ctx, [][]rune{{97, 98, 0, 0}, emptyRow, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{97, 98, 0, 0}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{97, 98}})
 	expectPositionOnScreen(ctx, 2, 0)
 	expectLineAndPosition(ctx, 0, 2)
 
 	sendChar(ctx, 99)
-	expectScreen(ctx, [][]rune{{97, 98, 99, 0}, emptyRow, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{97, 98, 99, 0}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{97, 98, 99}})
 	expectPositionOnScreen(ctx, 3, 0)
 
 	sendChar(ctx, 100)
-	expectScreen(ctx, [][]rune{{97, 98, 99, 100}, emptyRow, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{97, 98, 99, 100}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{97, 98, 99, 100}})
 	expectPositionOnScreen(ctx, 0, 1)
 
 	sendChar(ctx, 101)
-	expectScreen(ctx, [][]rune{{97, 98, 99, 100}, {101, 0, 0, 0}, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{97, 98, 99, 100}, {101, 0, 0, 0}, emptyRow, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{97, 98, 99, 100, 101}})
 	expectPositionOnScreen(ctx, 1, 1)
 
 	// Test newline on last line
 	sendKey(ctx, tcell.KeyEnter)
-	expectScreen(ctx, [][]rune{{97, 98, 99, 100}, {101, 0, 0, 0}, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{97, 98, 99, 100}, {101, 0, 0, 0}, emptyRow, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{97, 98, 99, 100, 101}, {}})
 	expectPositionOnScreen(ctx, 0, 2)
 
 	sendChar(ctx, 102)
 	sendChar(ctx, 103)
 	sendChar(ctx, 104)
-	expectScreen(ctx, [][]rune{{97, 98, 99, 100}, {101, 0, 0, 0}, {102, 103, 104, 0}, emptyRow})
+	expectScreen(ctx, [][]rune{{97, 98, 99, 100}, {101, 0, 0, 0}, {102, 103, 104, 0}, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{97, 98, 99, 100, 101}, {102, 103, 104}})
 	expectPositionOnScreen(ctx, 3, 2)
 	expectLineAndPosition(ctx, 1, 3)
@@ -154,5 +154,90 @@ func TestIntMinBasic(t *testing.T) {
 	sendKey(ctx, tcell.KeyDown)
 	expectPositionOnScreen(ctx, 3, 2)
 	expectLineAndPosition(ctx, 1, 3)
+	// Down - cannot go any more below, last line
+	sendKey(ctx, tcell.KeyDown)
+	expectPositionOnScreen(ctx, 3, 2)
+	expectLineAndPosition(ctx, 1, 3)
+	// Left - go to previus location
+	sendKey(ctx, tcell.KeyLeft)
+	expectPositionOnScreen(ctx, 2, 2)
+	expectLineAndPosition(ctx, 1, 2)
+	// 2 more times, go to beginning of line
+	sendKey(ctx, tcell.KeyLeft)
+	sendKey(ctx, tcell.KeyLeft)
+	expectPositionOnScreen(ctx, 0, 2)
+	expectLineAndPosition(ctx, 1, 0)
+	// Cannot go any more left
+	sendKey(ctx, tcell.KeyLeft)
+	expectPositionOnScreen(ctx, 0, 2)
+	expectLineAndPosition(ctx, 1, 0)
 
+	/*
+	  T Y P I N G
+	*/
+	// Type at the beginning of line
+	sendChar(ctx, 105)
+	expectScreen(ctx, [][]rune{{97, 98, 99, 100}, {101, 0, 0, 0}, {105, 102, 103, 104}, emptyRow, emptyRow, emptyRow})
+	expectData(ctx, [][]rune{{97, 98, 99, 100, 101}, {105, 102, 103, 104}})
+	expectPositionOnScreen(ctx, 1, 2)
+	expectLineAndPosition(ctx, 1, 1)
+
+	sendChar(ctx, 106)
+	expectScreen(ctx, [][]rune{{97, 98, 99, 100}, {101, 0, 0, 0}, {105, 106, 102, 103}, {104, 0, 0, 0}, emptyRow, emptyRow})
+	expectData(ctx, [][]rune{{97, 98, 99, 100, 101}, {105, 106, 102, 103, 104}})
+	expectPositionOnScreen(ctx, 2, 2)
+	expectLineAndPosition(ctx, 1, 2)
+
+	// Enter in the middle of line
+	sendKey(ctx, tcell.KeyEnter)
+	expectScreen(ctx, [][]rune{{97, 98, 99, 100}, {101, 0, 0, 0}, {105, 106, 0, 0}, {102, 103, 104, 0}, emptyRow, emptyRow})
+	expectData(ctx, [][]rune{{97, 98, 99, 100, 101}, {105, 106}, {102, 103, 104}})
+	expectPositionOnScreen(ctx, 0, 3)
+	expectLineAndPosition(ctx, 2, 0)
+
+	// Enter for empty line
+	sendKey(ctx, tcell.KeyEnter)
+	expectScreen(ctx, [][]rune{{97, 98, 99, 100}, {101, 0, 0, 0}, {105, 106, 0, 0}, emptyRow, {102, 103, 104, 0}, emptyRow})
+	expectData(ctx, [][]rune{{97, 98, 99, 100, 101}, {105, 106}, {}, {102, 103, 104}})
+	expectPositionOnScreen(ctx, 0, 4)
+	expectLineAndPosition(ctx, 3, 0)
+}
+
+func TestBasic2(t *testing.T) {
+	resp := make(chan bool)
+	h, d := initDisplay(resp)
+	ctx := context{h: h, resp: resp, t: t, d: d}
+
+	// Test case when first line starts overflowiing => further lines get shifted
+
+	sendChar(ctx, 97)
+	sendChar(ctx, 98)
+	sendChar(ctx, 99)
+	sendKey(ctx, tcell.KeyEnter)
+	sendChar(ctx, 100)
+	sendKey(ctx, tcell.KeyEnter)
+	sendChar(ctx, 101)
+	sendChar(ctx, 102)
+	sendChar(ctx, 103)
+	sendChar(ctx, 104)
+	sendChar(ctx, 105)
+
+	// Make sure we good
+	expectScreen(ctx, [][]rune{{97, 98, 99, 0}, {100, 0, 0, 0}, {101, 102, 103, 104}, {105, 0, 0, 0}, emptyRow, emptyRow})
+	expectData(ctx, [][]rune{{97, 98, 99}, {100}, {101, 102, 103, 104, 105}})
+	expectPositionOnScreen(ctx, 1, 3)
+	expectLineAndPosition(ctx, 2, 5)
+
+	// Jump to the beginning and overflow by typing something
+	sendKey(ctx, tcell.KeyUp)
+	sendKey(ctx, tcell.KeyUp)
+	sendKey(ctx, tcell.KeyRight)
+	sendKey(ctx, tcell.KeyRight)
+	sendKey(ctx, tcell.KeyRight)
+	expectPositionOnScreen(ctx, 3, 0)
+	expectLineAndPosition(ctx, 0, 3)
+
+	// Text full, console newline but still no shift
+	sendChar(ctx, 106)
+	expectScreen(ctx, [][]rune{{97, 98, 99, 106}, {100, 0, 0, 0}, {101, 102, 103, 104}, {105, 0, 0, 0}, emptyRow, emptyRow})
 }
