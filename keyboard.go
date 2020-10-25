@@ -45,8 +45,10 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 	case tcell.KeyEnter:
 		{
 			cur := c.getCurrentEl()
-			newItem := Line{data: cur.data[cur.pos:], startingCoordY: cur.startingCoordY + cur.getCurrentY(), height: 1, pos: 0, display: c}
-			cur.data = cur.data[:cur.pos]
+			newData := make([]rune, len(cur.data)-cur.pos)
+			copy(newData, cur.data[cur.pos:])
+			newItem := Line{data: newData, startingCoordY: cur.startingCoordY + cur.getCurrentY(), height: 1, pos: 0, display: c}
+			cur.data = cur.data[:cur.pos] // we can optimize memory here, by duplicating it.
 			c.data.InsertAfter(&newItem, c.currentElement)
 			cur.resync()
 			newItem.resync()
@@ -59,7 +61,7 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 		}
 	default:
 		{
-			log.Print("Key pressed", op.key)
+			log.Print("Key pressed", op.rn)
 			c.getCurrentEl().insertCharInCurrentPosition(op.rn)
 		}
 	}

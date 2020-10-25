@@ -240,4 +240,5 @@ func TestBasic2(t *testing.T) {
 	// Text full, console newline but still no shift
 	sendChar(ctx, 106)
 	expectScreen(ctx, [][]rune{{97, 98, 99, 106}, {100, 0, 0, 0}, {101, 102, 103, 104}, {105, 0, 0, 0}, emptyRow, emptyRow})
+	expectData(ctx, [][]rune{{97, 98, 99, 106}, {100}, {101, 102, 103, 104, 105}})
 }

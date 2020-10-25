@@ -32,7 +32,15 @@ func (r *realBlinker) clear() {
 		r.d.screen.putStr(r.d.currentX, r.d.currentY, r.d.getCurrentEl().getCurrentChar())
 	} else {
 		// FIXME: exception: it might be on beginning of another line. Fix the case.
-		r.d.screen.putStr(r.d.currentX, r.d.currentY, rune(0))
+		if r.d.currentX == 0 && r.d.hasNextEl() && r.d.currentY == r.d.getNextEl().startingCoordY {
+			if len(r.d.getNextEl().data) > 0 {
+				r.d.screen.putStr(r.d.currentX, r.d.currentY, r.d.getNextEl().data[0])
+			} else {
+				r.d.screen.putStr(r.d.currentX, r.d.currentY, rune(0))
+			}
+		} else {
+			r.d.screen.putStr(r.d.currentX, r.d.currentY, rune(0))
+		}
 	}
 }
 
