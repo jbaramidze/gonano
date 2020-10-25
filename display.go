@@ -60,14 +60,15 @@ func (c *Display) setBlinker(b blinker) {
 	c.blinker = b
 }
 
-func (c *Display) resyncNeeded(all bool) {
+// Current line should have correct startingY !
+func (c *Display) resyncAll() {
 	curr := c.currentElement
+	startingY := c.getCurrentEl().startingCoordY
 	for curr != nil {
-		oldHeight := curr.Value.(*Line).height
-		curr.Value.(*Line).resync()
-		if oldHeight == curr.Value.(*Line).height && !all {
-			break
-		}
+		line := curr.Value.(*Line)
+		line.startingCoordY = startingY
+		line.resync()
+		startingY += line.height
 		curr = curr.Next()
 	}
 }

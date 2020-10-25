@@ -45,7 +45,7 @@ func (l *Line) insertCharInCurrentPosition(char rune) {
 	l.data = insertInSlice(l.data, char, l.pos)
 	l.pos++
 
-	l.display.resyncNeeded(false)
+	l.display.resyncAll() // No need to call if nothing height-related changes
 	l.display.syncCoords()
 }
 
