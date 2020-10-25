@@ -47,11 +47,10 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 			cur := c.getCurrentEl()
 			newData := make([]rune, len(cur.data)-cur.pos)
 			copy(newData, cur.data[cur.pos:])
-			newItem := Line{data: newData, startingCoordY: cur.startingCoordY + cur.getCurrentY(), height: 1, pos: 0, display: c}
-			cur.data = cur.data[:cur.pos] // we can optimize memory here, by duplicating it.
+			newItem := Line{data: newData, startingCoordY: cur.startingCoordY + cur.getCurrentY(), height: -1, pos: 0, display: c}
 			c.data.InsertAfter(&newItem, c.currentElement)
-			cur.resync()
-			newItem.resync()
+			cur.data = cur.data[:cur.pos] // we can optimize memory here, by duplicating it.
+			c.resyncNeeded(true)
 			c.currentElement = c.currentElement.Next()
 			c.syncCoords()
 		}

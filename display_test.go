@@ -203,7 +203,7 @@ func TestBasic1(t *testing.T) {
 	expectLineAndPosition(ctx, 3, 0)
 }
 
-func TestBasic2(t *testing.T) {
+func STestBasic2(t *testing.T) {
 	resp := make(chan bool)
 	h, d := initDisplay(resp)
 	ctx := context{h: h, resp: resp, t: t, d: d}
@@ -241,4 +241,9 @@ func TestBasic2(t *testing.T) {
 	sendChar(ctx, 106)
 	expectScreen(ctx, [][]rune{{97, 98, 99, 106}, {100, 0, 0, 0}, {101, 102, 103, 104}, {105, 0, 0, 0}, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{97, 98, 99, 106}, {100}, {101, 102, 103, 104, 105}})
+
+	// Shift happening
+	sendChar(ctx, 107)
+	expectScreen(ctx, [][]rune{{97, 98, 99, 106}, {107, 0, 0, 0}, {100, 0, 0, 0}, {101, 102, 103, 104}, {105, 0, 0, 0}, emptyRow})
+	expectData(ctx, [][]rune{{97, 98, 99, 106, 107}, {100}, {101, 102, 103, 104, 105}})
 }

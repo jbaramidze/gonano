@@ -60,6 +60,18 @@ func (c *Display) setBlinker(b blinker) {
 	c.blinker = b
 }
 
+func (c *Display) resyncNeeded(all bool) {
+	curr := c.currentElement
+	for curr != nil {
+		oldHeight := curr.Value.(*Line).height
+		curr.Value.(*Line).resync()
+		if oldHeight == curr.Value.(*Line).height && !all {
+			break
+		}
+		curr = curr.Next()
+	}
+}
+
 func (c *Display) pollKeyboard(resp chan bool) {
 	for {
 		ev := c.screen.pollKeyPress()
