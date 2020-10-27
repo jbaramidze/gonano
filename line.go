@@ -41,14 +41,6 @@ func (l *Line) getBlinkerCoords() (int, int) {
 	return x, y
 }
 
-func (l *Line) insertCharInCurrentPosition(char rune) {
-	l.data = insertInSlice(l.data, char, l.pos)
-	l.pos++
-
-	l.display.resyncAll() // No need to call if nothing height-related changes
-	l.display.syncCoords()
-}
-
 func (l *Line) getCurrentY() int {
 	return 1 + l.pos/l.display.getWidth()
 }

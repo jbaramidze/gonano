@@ -54,14 +54,18 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 			c.currentElement = c.currentElement.Next()
 			c.syncCoords()
 		}
+	case tcell.KeyDEL:
+		{
+			c.remove()
+		}
 	case tcell.KeyCtrlF:
 		{
 			c.dump()
 		}
 	default:
 		{
-			log.Print("Key pressed", op.rn)
-			c.getCurrentEl().insertCharInCurrentPosition(op.rn)
+			log.Printf("Key pressed %v (%v)", op.rn, op.key)
+			c.insert(op.rn)
 		}
 	}
 }

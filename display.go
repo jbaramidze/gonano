@@ -60,6 +60,34 @@ func (c *Display) setBlinker(b blinker) {
 	c.blinker = b
 }
 
+func (c *Display) insert(char rune) {
+	c.getCurrentEl().data = insertInSlice(c.getCurrentEl().data, char, c.getCurrentEl().pos)
+	c.getCurrentEl().pos++
+
+	c.resyncAll() // No need to call if nothing height-related changes
+	c.syncCoords()
+}
+
+func (c *Display) remove() {
+	if c.getCurrentEl().pos == 0 {
+		if !c.hasPrevEl() {
+			return
+		}
+
+		p := c.currentElement.Prev()
+		pl := p.Value.(*Line)
+		pl.data = append(pl.data, c.getCurrentEl().data...)
+		c.data.Remove(c.currentElement)
+		c.currentElement = p
+	} else {
+		c.getCurrentEl().pos--
+		c.getCurrentEl().data = removeFromSlice(c.getCurrentEl().data, c.getCurrentEl().pos)
+	}
+
+	c.resyncAll() // No need to call if nothing height-related changes
+	c.syncCoords()
+}
+
 // Current line should have correct startingY !
 func (c *Display) resyncAll() {
 	curr := c.currentElement
@@ -70,6 +98,11 @@ func (c *Display) resyncAll() {
 		line.resync()
 		startingY += line.height
 		curr = curr.Next()
+	}
+
+	// Clean at startingY
+	for i := 0; i < c.getWidth(); i++ {
+		c.screen.putStr(i, startingY, rune(0))
 	}
 }
 

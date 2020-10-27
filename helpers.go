@@ -18,3 +18,10 @@ func insertInSlice(arr []rune, p rune, i int) []rune {
 	arr1[i] = p
 	return arr1
 }
+
+func removeFromSlice(arr []rune, i int) []rune {
+	n := make([]rune, len(arr)-1)
+	copy(n, arr[:i])
+	copy(n[i:], arr[i+1:])
+	return n
+}
