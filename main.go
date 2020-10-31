@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 )
 
@@ -15,15 +14,9 @@ func main() {
 
 	arg := os.Args[1]
 
-	data, err := ioutil.ReadFile(arg)
-	if err != nil {
-		fmt.Printf("Error: Opening file failed: %v", err)
-		return
-	}
-
 	handler := initPhysicalScreenHandler()
 	editor := createEditor(handler)
-	editor.initData(data)
+	editor.initData(arg)
 
 	blinkr := initRealBlinker(editor)
 	editor.setBlinker(blinkr)

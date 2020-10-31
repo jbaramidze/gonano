@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"io/ioutil"
 	"strings"
 
 	"github.com/gdamore/tcell"
@@ -8,19 +10,29 @@ import (
 
 // Editor is main editor structure.
 type Editor struct {
-	display *Display
+	display  *Display
+	filename string
 }
 
 func createEditor(handler screenHandler) *Editor {
 	display := createDisplay(handler)
-	return &Editor{display: display}
+	editor := Editor{display: display}
+	return &editor
 }
 
 func (e *Editor) startLoop() {
 	e.display.startLoop()
 }
 
-func (e *Editor) initData(data []byte) {
+func (e *Editor) initData(filename string) {
+	e.filename = filename
+
+	data, err := ioutil.ReadFile(e.filename)
+	if err != nil {
+		fmt.Printf("Error: Opening file failed: %v", err)
+		return
+	}
+
 	fields := strings.Fields(string(data))
 	for i, field := range fields {
 		if i == 0 {
@@ -44,13 +56,31 @@ func (e *Editor) initData(data []byte) {
 
 }
 
+func (e *Editor) saveData() {
+	data := []rune{}
+	for it := e.display.data.Front(); it != nil; it = it.Next() {
+		data = append(data, it.Value.(*Line).data...)
+		data = append(data, rune(10))
+	}
+
+	err := ioutil.WriteFile(e.filename, []byte(string(data)), 0644)
+
+	if err != nil {
+		fmt.Printf("Error: failed writing to file: %v", err)
+		return
+	}
+}
+
 func (e *Editor) pollKeyboard(resp chan bool) {
 	for {
 		ev := e.display.screen.pollKeyPress()
-		if ev.k == tcell.KeyTAB {
+		if ev.k == tcell.KeyCtrlQ {
 			return
+		} else if ev.k == tcell.KeyCtrlW {
+			e.saveData()
+		} else {
+			e.display.monitorChannel <- TypeOperation{rn: ev.rn, key: ev.k, resp: resp}
 		}
-		e.display.monitorChannel <- TypeOperation{rn: ev.rn, key: ev.k, resp: resp}
 	}
 }
 
