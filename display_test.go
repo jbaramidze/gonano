@@ -203,6 +203,54 @@ func TestBasic1(t *testing.T) {
 	expectLineAndPosition(ctx, 3, 0)
 }
 
+func TestDeletes(t *testing.T) {
+	resp := make(chan bool)
+	h, d := initDisplay(resp)
+	ctx := context{h: h, resp: resp, t: t, d: d}
+
+	sendKey(ctx, tcell.KeyDEL)
+	expectPositionOnScreen(ctx, 0, 0)
+
+	// Delete in the middle of line
+	sendChar(ctx, 97)
+	sendChar(ctx, 98)
+	sendChar(ctx, 99)
+
+	sendKey(ctx, tcell.KeyDEL)
+	expectScreen(ctx, [][]rune{{97, 98, 0, 0}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
+	expectData(ctx, [][]rune{{97, 98}})
+	expectPositionOnScreen(ctx, 2, 0)
+
+	// Delete in the middle of 2nd line, both chars
+	sendKey(ctx, tcell.KeyEnter)
+	sendChar(ctx, 100)
+	sendChar(ctx, 101)
+	expectScreen(ctx, [][]rune{{97, 98, 0, 0}, {100, 101, 0, 0}, emptyRow, emptyRow, emptyRow, emptyRow})
+	expectData(ctx, [][]rune{{97, 98}, {100, 101}})
+	expectPositionOnScreen(ctx, 2, 1)
+
+	sendKey(ctx, tcell.KeyDEL)
+	expectScreen(ctx, [][]rune{{97, 98, 0, 0}, {100, 0, 0, 0}, emptyRow, emptyRow, emptyRow, emptyRow})
+	expectData(ctx, [][]rune{{97, 98}, {100}})
+	expectPositionOnScreen(ctx, 1, 1)
+
+	sendKey(ctx, tcell.KeyDEL)
+	expectScreen(ctx, [][]rune{{97, 98, 0, 0}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
+	expectData(ctx, [][]rune{{97, 98}, {}})
+	expectPositionOnScreen(ctx, 0, 1)
+
+	sendKey(ctx, tcell.KeyDEL)
+	expectScreen(ctx, [][]rune{{97, 98, 0, 0}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
+	expectData(ctx, [][]rune{{97, 98}})
+	expectPositionOnScreen(ctx, 2, 0)
+
+	sendKey(ctx, tcell.KeyDEL)
+	sendKey(ctx, tcell.KeyDEL)
+	expectScreen(ctx, [][]rune{emptyRow, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
+	expectData(ctx, [][]rune{{}})
+	expectPositionOnScreen(ctx, 0, 0)
+}
+
 func TestBasic2(t *testing.T) {
 	resp := make(chan bool)
 	h, d := initDisplay(resp)
