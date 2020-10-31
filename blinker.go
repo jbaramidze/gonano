@@ -44,8 +44,8 @@ func (r *realBlinker) clear() {
 	}
 }
 
-func initRealBlinker(d *Display) blinker {
-	b := &realBlinker{d: d, blinkIsSet: false}
+func initRealBlinker(e *Editor) blinker {
+	b := &realBlinker{d: e.display, blinkIsSet: false}
 	go func(c chan ContentOperation) {
 		ticker := time.NewTicker(500 * time.Millisecond)
 		for {
@@ -53,7 +53,7 @@ func initRealBlinker(d *Display) blinker {
 			b.blinkIsSet = !b.blinkIsSet
 			c <- BlinkOperation{blink: b.blinkIsSet}
 		}
-	}(d.monitorChannel)
+	}(e.display.monitorChannel)
 
 	return b
 }
@@ -73,16 +73,16 @@ func (b *mockBlinker) clear() {
 	b.rb.clear()
 }
 
-func initMockBlinker(d *Display) blinker {
+func initMockBlinker(e *Editor) blinker {
 	ticker := make(chan bool)
-	b := &realBlinker{d: d, blinkIsSet: false}
+	b := &realBlinker{d: e.display, blinkIsSet: false}
 	go func(c chan ContentOperation) {
 		for {
 			<-ticker
 			b.blinkIsSet = !b.blinkIsSet
 			c <- BlinkOperation{blink: b.blinkIsSet}
 		}
-	}(d.monitorChannel)
+	}(e.display.monitorChannel)
 
 	return b
 }

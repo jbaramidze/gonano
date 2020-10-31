@@ -9,26 +9,26 @@ import (
 
 var emptyRow []rune = []rune{0, 0, 0, 0}
 
-func initDisplay(resp chan bool) (*mockScreenHandler, *Display) {
+func initEditor(resp chan bool) (*mockScreenHandler, *Editor) {
 	handler := initMockScreenHandler()
-	display := createDisplay(handler)
+	editor := createEditor(handler)
 
-	blinkr := initMockBlinker(display)
-	display.setBlinker(blinkr)
+	blinkr := initMockBlinker(editor)
+	editor.setBlinker(blinkr)
 
-	go display.startLoop()
-	defer display.Close()
+	go editor.startLoop()
+	defer editor.display.Close()
 
-	go display.pollKeyboard(resp)
+	go editor.pollKeyboard(resp)
 
-	return handler.(*mockScreenHandler), display
+	return handler.(*mockScreenHandler), editor
 }
 
 type context struct {
 	h    *mockScreenHandler
 	resp chan bool
 	t    *testing.T
-	d    *Display
+	e    *Editor
 }
 
 func sendChar(ctx context, c rune) {
@@ -49,7 +49,7 @@ func expectScreen(ctx context, data [][]rune) {
 
 func expectData(ctx context, data [][]rune) {
 	sz := 0
-	for i, j := ctx.d.data.Front(), 0; i != nil; i, j = i.Next(), j+1 {
+	for i, j := ctx.e.display.data.Front(), 0; i != nil; i, j = i.Next(), j+1 {
 		l := i.Value.(*Line)
 		sz++
 		if !reflect.DeepEqual(l.data, data[j]) {
@@ -62,29 +62,29 @@ func expectData(ctx context, data [][]rune) {
 }
 
 func expectPositionOnScreen(ctx context, x int, y int) {
-	if ctx.d.currentX != x || ctx.d.currentY != y {
-		ctx.t.Errorf("Incorrect coords (%v, %v) vs (%v, %v)", ctx.d.currentX, ctx.d.currentY, x, y)
+	if ctx.e.display.currentX != x || ctx.e.display.currentY != y {
+		ctx.t.Errorf("Incorrect coords (%v, %v) vs (%v, %v)", ctx.e.display.currentX, ctx.e.display.currentY, x, y)
 	}
 }
 
 func expectLineAndPosition(ctx context, line int, pos int) {
-	firstLine := ctx.d.data.Front()
+	firstLine := ctx.e.display.data.Front()
 	for i := 0; i < line; i++ {
 		firstLine = firstLine.Next()
 	}
-	if firstLine.Value != ctx.d.getCurrentEl() {
+	if firstLine.Value != ctx.e.display.getCurrentEl() {
 		ctx.t.Errorf("Incorrect line %v", line)
 	}
 
-	if ctx.d.getCurrentEl().pos != pos {
-		ctx.t.Errorf("Incorrect pos %v vs %v", ctx.d.getCurrentEl().pos, pos)
+	if ctx.e.display.getCurrentEl().pos != pos {
+		ctx.t.Errorf("Incorrect pos %v vs %v", ctx.e.display.getCurrentEl().pos, pos)
 	}
 }
 
 func TestBasic1(t *testing.T) {
 	resp := make(chan bool)
-	h, d := initDisplay(resp)
-	ctx := context{h: h, resp: resp, t: t, d: d}
+	h, e := initEditor(resp)
+	ctx := context{h: h, resp: resp, t: t, e: e}
 
 	expectPositionOnScreen(ctx, 0, 0)
 
@@ -205,8 +205,8 @@ func TestBasic1(t *testing.T) {
 
 func TestDeletes(t *testing.T) {
 	resp := make(chan bool)
-	h, d := initDisplay(resp)
-	ctx := context{h: h, resp: resp, t: t, d: d}
+	h, e := initEditor(resp)
+	ctx := context{h: h, resp: resp, t: t, e: e}
 
 	sendKey(ctx, tcell.KeyDEL)
 	expectPositionOnScreen(ctx, 0, 0)
@@ -253,8 +253,8 @@ func TestDeletes(t *testing.T) {
 
 func TestBasic2(t *testing.T) {
 	resp := make(chan bool)
-	h, d := initDisplay(resp)
-	ctx := context{h: h, resp: resp, t: t, d: d}
+	h, e := initEditor(resp)
+	ctx := context{h: h, resp: resp, t: t, e: e}
 
 	// Test case when first line starts overflowiing => further lines get shifted
 

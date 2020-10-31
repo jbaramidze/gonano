@@ -56,10 +56,6 @@ func createDisplay(handler screenHandler) *Display {
 	return d
 }
 
-func (c *Display) setBlinker(b blinker) {
-	c.blinker = b
-}
-
 func (c *Display) insert(char rune) {
 	c.getCurrentEl().data = insertInSlice(c.getCurrentEl().data, char, c.getCurrentEl().pos)
 	c.getCurrentEl().pos++
@@ -103,16 +99,6 @@ func (c *Display) resyncAll() {
 	// Clean at startingY
 	for i := 0; i < c.getWidth(); i++ {
 		c.screen.putStr(i, startingY, rune(0))
-	}
-}
-
-func (c *Display) pollKeyboard(resp chan bool) {
-	for {
-		ev := c.screen.pollKeyPress()
-		if ev.k == tcell.KeyTAB {
-			return
-		}
-		c.monitorChannel <- TypeOperation{rn: ev.rn, key: ev.k, resp: resp}
 	}
 }
 

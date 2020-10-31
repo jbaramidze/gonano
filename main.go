@@ -1,14 +1,25 @@
 package main
 
 func main() {
+
+	// arg := os.Args[1]
+
+	// data, err := ioutil.ReadFile(arg)
+	// if err != nil {
+	// 	fmt.Printf("Opening file failed: %v", err)
+	// 	return
+	// }
+	//
+	//fmt.Printf("%v", data)
+
 	handler := initPhysicalScreenHandler()
-	display := createDisplay(handler)
+	editor := createEditor(handler)
 
-	blinkr := initRealBlinker(display)
-	display.setBlinker(blinkr)
+	blinkr := initRealBlinker(editor)
+	editor.setBlinker(blinkr)
 
-	go display.startLoop()
-	defer display.Close()
+	go editor.startLoop()
+	defer editor.display.Close()
 
-	display.pollKeyboard(nil)
+	editor.pollKeyboard(nil)
 }
