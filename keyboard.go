@@ -50,7 +50,7 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 			newItem := Line{data: newData, startingCoordY: cur.startingCoordY + cur.getCurrentY(), height: -1, pos: 0, display: c}
 			c.data.InsertAfter(&newItem, c.currentElement)
 			cur.data = cur.data[:cur.pos] // we can optimize memory here, by duplicating it.
-			c.resyncAll()
+			c.resyncBelowCurrent()
 			c.currentElement = c.currentElement.Next()
 			c.syncCoords()
 		}

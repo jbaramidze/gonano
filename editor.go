@@ -12,11 +12,20 @@ import (
 type Editor struct {
 	display  *Display
 	filename string
+	modified bool
+	mode     editoMode
 }
+
+type editoMode int
+
+const (
+	normal editoMode = iota
+	quitWithoutSaving
+)
 
 func createEditor(handler screenHandler) *Editor {
 	display := createDisplay(handler)
-	editor := Editor{display: display}
+	editor := Editor{display: display, modified: false}
 	return &editor
 }
 
@@ -47,7 +56,7 @@ func (e *Editor) initData(filename string) {
 
 	// Move current to the beginning to resync
 	e.display.currentElement = e.display.data.Front()
-	e.display.resyncAll()
+	e.display.resyncBelowCurrent()
 
 	// Leave it at the end
 	e.display.currentElement = e.display.data.Back()
@@ -75,10 +84,14 @@ func (e *Editor) pollKeyboard(resp chan bool) {
 	for {
 		ev := e.display.screen.pollKeyPress()
 		if ev.k == tcell.KeyCtrlQ {
-			return
+			if e.modified == false {
+				return
+			}
+			e.display.monitorChannel <- AnnouncementOperation{text: []string{"You will lose your changes!", "Are you sure you want to quit? Y/N"}}
 		} else if ev.k == tcell.KeyCtrlW {
 			e.saveData()
 		} else {
+			e.modified = true
 			e.display.monitorChannel <- TypeOperation{rn: ev.rn, key: ev.k, resp: resp}
 		}
 	}

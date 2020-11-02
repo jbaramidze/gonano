@@ -60,7 +60,7 @@ func (c *Display) insert(char rune) {
 	c.getCurrentEl().data = insertInSlice(c.getCurrentEl().data, char, c.getCurrentEl().pos)
 	c.getCurrentEl().pos++
 
-	c.resyncAll() // No need to call if nothing height-related changes
+	c.resyncBelowCurrent() // No need to call if nothing height-related changes
 	c.syncCoords()
 }
 
@@ -80,12 +80,12 @@ func (c *Display) remove() {
 		c.getCurrentEl().data = removeFromSlice(c.getCurrentEl().data, c.getCurrentEl().pos)
 	}
 
-	c.resyncAll() // No need to call if nothing height-related changes
+	c.resyncBelowCurrent() // No need to call if nothing height-related changes
 	c.syncCoords()
 }
 
 // Current line should have correct startingY !
-func (c *Display) resyncAll() {
+func (c *Display) resyncBelowCurrent() {
 	curr := c.currentElement
 	startingY := c.getCurrentEl().startingCoordY
 	for curr != nil {
@@ -124,6 +124,22 @@ func (c *Display) startLoop() {
 			{
 				c.blinker.refresh()
 			}
+		case AnnouncementOperation:
+			{
+				c.drawText(decoded.text)
+				if decoded.resp != nil {
+					decoded.resp <- true
+				}
+			}
+		}
+	}
+}
+
+func (c *Display) drawText(text []string) {
+	w, h := c.screen.getSize()
+	for j := 0; j < len(text); j++ {
+		for i, ch := range text[j] {
+			c.screen.putStr(w/2-len(text)/2+i, h/2+j, ch)
 		}
 	}
 }
@@ -150,4 +166,10 @@ type TypeOperation struct {
 // BlinkOperation ss
 type BlinkOperation struct {
 	blink bool
+}
+
+// AnnouncementOperation ss
+type AnnouncementOperation struct {
+	text []string
+	resp chan bool
 }
