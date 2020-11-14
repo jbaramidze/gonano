@@ -30,6 +30,11 @@ func (c *Display) getWidth() int {
 	return w
 }
 
+func (c *Display) getHeight() int {
+	_, h := c.screen.getSize()
+	return h
+}
+
 func (c *Display) getCurrentEl() *Line {
 	return c.currentElement.Value.(*Line)
 }
@@ -97,8 +102,10 @@ func (c *Display) resyncBelowCurrent() {
 	}
 
 	// Clean at startingY
-	for i := 0; i < c.getWidth(); i++ {
-		c.screen.putStr(i, startingY, rune(0))
+	for ; startingY < c.getHeight(); startingY++ {
+		for i := 0; i < c.getWidth(); i++ {
+			c.screen.putStr(i, startingY, rune(0))
+		}
 	}
 }
 
@@ -135,12 +142,50 @@ func (c *Display) startLoop() {
 	}
 }
 
+/*
+ *****************************
+ * Text will be in something *
+ *        like this          *
+ *****************************
+ */
+
 func (c *Display) drawText(text []string) {
 	w, h := c.screen.getSize()
+
+	maxW := 0
 	for j := 0; j < len(text); j++ {
-		for i, ch := range text[j] {
-			c.screen.putStr(w/2-len(text)/2+i, h/2+j, ch)
+		maxW = maxOf(maxW, len(text[j]))
+	}
+
+	startX := w/2 - maxW/2 - 2
+	endX := w/2 - maxW/2 - 2 + maxW + 4
+
+	for i := startX; i < endX; i++ {
+		c.screen.putStr(i, h/2-1, rune('*'))
+	}
+	for j := 0; j < len(text); j++ {
+		internalStartX := w/2 - len(text[j])/2
+		internalEndX := w/2 - len(text[j])/2 + len(text[j])
+		// first *
+		c.screen.putStr(startX, h/2+j, rune('*'))
+		// spaces
+		for i := startX + 1; i < internalStartX; i++ {
+			c.screen.putStr(i, h/2+j, rune(0))
 		}
+		// text
+		for i, ch := range text[j] {
+			c.screen.putStr(internalStartX+i, h/2+j, ch)
+		}
+		// spaces after text
+		for i := internalEndX; i < endX-1; i++ {
+			c.screen.putStr(i, h/2+j, rune(0))
+		}
+		// last *
+		c.screen.putStr(endX-1, h/2+j, rune('*'))
+	}
+
+	for i := startX; i < endX; i++ {
+		c.screen.putStr(i, h/2+len(text), rune('*'))
 	}
 }
 

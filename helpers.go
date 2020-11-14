@@ -12,6 +12,18 @@ func minOf(vars ...int) int {
 	return min
 }
 
+func maxOf(vars ...int) int {
+	max := vars[0]
+
+	for _, i := range vars {
+		if max < i {
+			max = i
+		}
+	}
+
+	return max
+}
+
 func insertInSlice(arr []rune, p rune, i int) []rune {
 	arr1 := append(arr, 0)
 	copy(arr1[i+1:], arr1[i:])
