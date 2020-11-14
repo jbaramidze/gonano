@@ -2,7 +2,7 @@ package main
 
 type mockScreenHandler struct {
 	data    [][]rune
-	keyChan chan event
+	keyChan chan interface{}
 }
 
 func (s *mockScreenHandler) close() {
@@ -16,13 +16,13 @@ func (s *mockScreenHandler) getSize() (int, int) {
 	return 4, 4
 }
 
-func (s *mockScreenHandler) pollKeyPress() event {
+func (s *mockScreenHandler) pollKeyPress() interface{} {
 	return <-s.keyChan
 }
 
 func initMockScreenHandler() screenHandler {
 	data := make([][]rune, 6)
-	c := make(chan event)
+	c := make(chan interface{})
 
 	for i := range data {
 		data[i] = make([]rune, 4)

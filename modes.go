@@ -8,7 +8,7 @@ import (
 )
 
 type mode interface {
-	handleKeyPress(e event, resp chan bool) (exit bool)
+	handleKeyPress(e keyEvent, resp chan bool) (exit bool)
 	init()
 }
 
@@ -24,12 +24,10 @@ func (m normalMode) init() {
 	tmp := m.e.display.currentElement
 	m.e.display.currentElement = m.e.display.data.Front()
 	m.e.display.resyncBelowCurrent()
-
-	// Leave it at the end
 	m.e.display.currentElement = tmp
 }
 
-func (m normalMode) handleKeyPress(ev event, resp chan bool) (exit bool) {
+func (m normalMode) handleKeyPress(ev keyEvent, resp chan bool) (exit bool) {
 	if ev.k == tcell.KeyCtrlQ {
 		if m.e.modified == false {
 			// Exit the editor
@@ -60,7 +58,7 @@ func (m quitWithoutSavingMode) init() {
 	m.e.display.monitorChannel <- AnnouncementOperation{text: []string{"You will lose your changes!", "Are you sure you want to quit? Y/N"}}
 }
 
-func (m quitWithoutSavingMode) handleKeyPress(ev event, resp chan bool) (exit bool) {
+func (m quitWithoutSavingMode) handleKeyPress(ev keyEvent, resp chan bool) (exit bool) {
 	if ev.rn == rune('y') {
 		return true
 	} else if ev.rn == rune('n') {
@@ -96,7 +94,7 @@ func (m savedMode) init() {
 	}()
 }
 
-func (m savedMode) handleKeyPress(ev event, resp chan bool) (exit bool) {
+func (m savedMode) handleKeyPress(ev keyEvent, resp chan bool) (exit bool) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	m.e.setMode(normalMode{m.e})

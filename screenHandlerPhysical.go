@@ -24,11 +24,13 @@ func (s *physicalScreenHandler) getSize() (int, int) {
 	return s.screen.Size()
 }
 
-func (s *physicalScreenHandler) pollKeyPress() event {
+func (s *physicalScreenHandler) pollKeyPress() interface{} {
 	for {
 		switch ev := s.screen.PollEvent().(type) {
 		case *tcell.EventKey:
-			return event{rn: ev.Rune(), k: ev.Key()}
+			return keyEvent{rn: ev.Rune(), k: ev.Key()}
+		case *tcell.EventResize:
+			return resizeEvent{}
 		}
 	}
 }

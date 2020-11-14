@@ -32,12 +32,12 @@ type context struct {
 }
 
 func sendChar(ctx context, c rune) {
-	ctx.h.keyChan <- event{rn: c}
+	ctx.h.keyChan <- keyEvent{rn: c}
 	<-ctx.resp
 }
 
 func sendKey(ctx context, k tcell.Key) {
-	ctx.h.keyChan <- event{k: k}
+	ctx.h.keyChan <- keyEvent{k: k}
 	<-ctx.resp
 }
 

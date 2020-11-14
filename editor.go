@@ -76,10 +76,20 @@ func (e *Editor) saveData() error {
 func (e *Editor) pollKeyboard(resp chan bool) {
 	for {
 		ev := e.display.screen.pollKeyPress()
-		exit := e.mode.handleKeyPress(ev, resp)
-		if exit == true {
-			return
+		switch t := ev.(type) {
+		case keyEvent:
+			exit := e.mode.handleKeyPress(t, resp)
+			if exit == true {
+				return
+			}
+		case resizeEvent:
+			tmp := e.display.currentElement
+			e.display.currentElement = e.display.data.Front()
+			e.display.resyncBelowCurrent()
+			e.display.currentElement = tmp
+			e.display.syncCoords()
 		}
+
 	}
 }
 
