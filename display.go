@@ -62,10 +62,16 @@ func createDisplay(handler screenHandler) *Display {
 }
 
 func (c *Display) insert(char rune) {
+	oldHeight := c.getCurrentEl().calculateHeight()
 	c.getCurrentEl().data = insertInSlice(c.getCurrentEl().data, char, c.getCurrentEl().pos)
 	c.getCurrentEl().pos++
+	newHeight := c.getCurrentEl().calculateHeight()
 
-	c.resyncBelowCurrent() // No need to call if nothing height-related changes
+	if oldHeight != newHeight {
+		c.resyncBelow(c.currentElement)
+	} else {
+		c.getCurrentEl().resync()
+	}
 	c.syncCoords()
 }
 
@@ -80,25 +86,33 @@ func (c *Display) remove() {
 		pl.data = append(pl.data, c.getCurrentEl().data...)
 		c.data.Remove(c.currentElement)
 		c.currentElement = p
+
+		c.resyncBelow(c.currentElement)
 	} else {
+		oldHeight := c.getCurrentEl().calculateHeight()
 		c.getCurrentEl().pos--
 		c.getCurrentEl().data = removeFromSlice(c.getCurrentEl().data, c.getCurrentEl().pos)
+		newHeight := c.getCurrentEl().calculateHeight()
+
+		if newHeight != oldHeight {
+			c.resyncBelow(c.currentElement)
+		} else {
+			c.getCurrentEl().resync()
+		}
 	}
 
-	c.resyncBelowCurrent() // No need to call if nothing height-related changes
 	c.syncCoords()
 }
 
 // Current line should have correct startingY !
-func (c *Display) resyncBelowCurrent() {
-	curr := c.currentElement
-	startingY := c.getCurrentEl().startingCoordY
-	for curr != nil {
-		line := curr.Value.(*Line)
+func (c *Display) resyncBelow(from *list.Element) {
+	startingY := from.Value.(*Line).startingCoordY
+	for from != nil && startingY < c.getHeight() {
+		line := from.Value.(*Line)
 		line.startingCoordY = startingY
 		line.resync()
 		startingY += line.height
-		curr = curr.Next()
+		from = from.Next()
 	}
 
 	// Clean at startingY

@@ -13,7 +13,7 @@ func (s *mockScreenHandler) putStr(x, y int, b rune) {
 }
 
 func (s *mockScreenHandler) getSize() (int, int) {
-	return 4, 4
+	return 4, 6
 }
 
 func (s *mockScreenHandler) pollKeyPress() interface{} {

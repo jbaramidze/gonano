@@ -12,6 +12,7 @@ type Editor struct {
 	filename string
 	modified bool
 	mode     mode
+	offsetY  int
 }
 
 func createEditor(handler screenHandler) *Editor {
@@ -46,9 +47,7 @@ func (e *Editor) initData(filename string) {
 		}
 	}
 
-	// Move current to the beginning to resync
-	e.display.currentElement = e.display.data.Front()
-	e.display.resyncBelowCurrent()
+	e.display.resyncBelow(e.display.data.Front())
 
 	// Leave it at the end
 	e.display.currentElement = e.display.data.Back()
@@ -83,10 +82,7 @@ func (e *Editor) pollKeyboard(resp chan bool) {
 				return
 			}
 		case resizeEvent:
-			tmp := e.display.currentElement
-			e.display.currentElement = e.display.data.Front()
-			e.display.resyncBelowCurrent()
-			e.display.currentElement = tmp
+			e.display.resyncBelow(e.display.data.Front())
 			e.display.syncCoords()
 		}
 

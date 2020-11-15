@@ -45,6 +45,10 @@ func (l *Line) getCurrentY() int {
 	return 1 + l.pos/l.display.getWidth()
 }
 
+func (l *Line) calculateHeight() int {
+	return 1 + (len(l.data)-1)/l.display.getWidth()
+}
+
 func (l *Line) resync() {
 	usableWidth := l.display.getWidth()
 	var line int

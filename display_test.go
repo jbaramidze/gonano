@@ -43,7 +43,7 @@ func sendKey(ctx context, k tcell.Key) {
 
 func expectScreen(ctx context, data [][]rune) {
 	if !reflect.DeepEqual(ctx.h.data, data) {
-		ctx.t.Errorf("Display content is wrong: %v", ctx.h.data)
+		ctx.t.Errorf("Display content is wrong! \n actual %v \n expected %v", ctx.h.data, data)
 	}
 }
 

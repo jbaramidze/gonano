@@ -23,7 +23,7 @@ func newNormalMode(e *Editor) normalMode {
 func (m normalMode) init() {
 	tmp := m.e.display.currentElement
 	m.e.display.currentElement = m.e.display.data.Front()
-	m.e.display.resyncBelowCurrent()
+	m.e.display.resyncBelow(m.e.display.currentElement)
 	m.e.display.currentElement = tmp
 }
 
