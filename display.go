@@ -15,6 +15,7 @@ type Display struct {
 	currentX, currentY int
 	monitorChannel     chan ContentOperation
 	blinker            blinker
+	offsetY            int
 }
 
 func (c *Display) dump() {
@@ -104,19 +105,32 @@ func (c *Display) remove() {
 	c.syncCoords()
 }
 
-// Current line should have correct startingY !
-func (c *Display) resyncBelow(from *list.Element) {
+func (c *Display) recalcBelow(from *list.Element) {
 	startingY := from.Value.(*Line).startingCoordY
-	for from != nil && startingY < c.getHeight() {
+	for ; from != nil && startingY-c.offsetY < c.getHeight(); from = from.Next() {
 		line := from.Value.(*Line)
 		line.startingCoordY = startingY
-		line.resync()
+		line.height = line.calculateHeight()
 		startingY += line.height
-		from = from.Next()
+	}
+}
+
+// Current line should have correct startingY !
+func (c *Display) resyncBelow(from *list.Element) {
+	c.recalcBelow(from)
+	for ; from != nil && from.Value.(*Line).startingCoordY-c.offsetY < c.getHeight(); from = from.Next() {
+		from.Value.(*Line).resync()
 	}
 
 	// Clean at startingY
-	for ; startingY < c.getHeight(); startingY++ {
+	startingY := 0
+	if from != nil {
+		startingY = from.Value.(*Line).startingCoordY + from.Value.(*Line).height
+	} else {
+		startingY = c.data.Back().Value.(*Line).startingCoordY + c.data.Back().Value.(*Line).height
+	}
+
+	for ; startingY-c.offsetY < c.getHeight(); startingY++ {
 		for i := 0; i < c.getWidth(); i++ {
 			c.screen.putStr(i, startingY, rune(0))
 		}

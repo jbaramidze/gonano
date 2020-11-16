@@ -54,7 +54,10 @@ func (l *Line) resync() {
 	var line int
 	for i, r := range l.data {
 		line = i / usableWidth
-		l.display.screen.putStr(i-(line*usableWidth), l.startingCoordY+line, r)
+		y := l.startingCoordY + line - l.display.offsetY
+		if y >= 0 {
+			l.display.screen.putStr(i-(line*usableWidth), y, r)
+		}
 	}
 	l.height = line + 1
 	// Clear the rest
@@ -65,7 +68,10 @@ func (l *Line) resync() {
 			if idx <= len(l.data) {
 				continue
 			}
-			l.display.screen.putStr(j, l.startingCoordY+i, 0)
+			y := l.startingCoordY + i - l.display.offsetY
+			if y >= 0 {
+				l.display.screen.putStr(j, y, 0)
+			}
 		}
 	}
 }
