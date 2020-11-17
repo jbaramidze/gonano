@@ -35,14 +35,14 @@ func (l *Line) getCurrentChar() rune {
 	return l.data[l.pos]
 }
 
-func (l *Line) getBlinkerCoords() (int, int) {
+func (l *Line) getRelativeBlinkerCoordsByPos() (int, int) {
 	y := l.pos / l.display.getWidth()
 	x := l.pos - y*l.display.getWidth()
 	return x, y
 }
 
 func (l *Line) getCurrentY() int {
-	return 1 + l.pos/l.display.getWidth()
+	return l.pos / l.display.getWidth()
 }
 
 func (l *Line) calculateHeight() int {

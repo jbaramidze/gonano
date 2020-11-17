@@ -7,9 +7,9 @@ import (
 )
 
 func (c *Display) syncCoords() {
-	blinkerX, blinkerY := c.getCurrentEl().getBlinkerCoords()
+	blinkerX, blinkerY := c.getCurrentEl().getRelativeBlinkerCoordsByPos()
 	c.currentX = blinkerX
-	c.currentY = blinkerY + c.getCurrentEl().startingCoordY
+	c.currentY = blinkerY + c.getCurrentEl().startingCoordY - c.offsetY
 }
 
 func (c *Display) handleKeyPress(op TypeOperation) {
@@ -45,13 +45,23 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 	case tcell.KeyEnter:
 		{
 			cur := c.getCurrentEl()
+
+			// Create new line
 			newData := make([]rune, len(cur.data)-cur.pos)
 			copy(newData, cur.data[cur.pos:])
-			newItem := Line{data: newData, startingCoordY: cur.startingCoordY + cur.getCurrentY(), height: -1, pos: 0, display: c}
+			newItem := Line{data: newData, startingCoordY: cur.startingCoordY + cur.getCurrentY() + 1, height: -1, pos: 0, display: c}
+
 			c.data.InsertAfter(&newItem, c.currentElement)
+
 			cur.data = cur.data[:cur.pos] // we can optimize memory here, by duplicating it.
-			c.resyncBelow(c.currentElement)
 			c.currentElement = c.currentElement.Next()
+
+			if c.getCurrentEl().startingCoordY-c.offsetY == c.getHeight() {
+				c.offsetY++
+				c.resyncBelow(c.data.Front())
+			} else {
+				c.resyncBelow(c.currentElement.Prev())
+			}
 			c.syncCoords()
 		}
 	case tcell.KeyDEL:

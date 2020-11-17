@@ -107,7 +107,7 @@ func (c *Display) remove() {
 
 func (c *Display) recalcBelow(from *list.Element) {
 	startingY := from.Value.(*Line).startingCoordY
-	for ; from != nil && startingY-c.offsetY < c.getHeight(); from = from.Next() {
+	for ; from != nil; from = from.Next() {
 		line := from.Value.(*Line)
 		line.startingCoordY = startingY
 		line.height = line.calculateHeight()
