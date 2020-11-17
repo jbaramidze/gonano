@@ -56,8 +56,9 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 			cur.data = cur.data[:cur.pos] // we can optimize memory here, by duplicating it.
 			c.currentElement = c.currentElement.Next()
 
-			if c.getCurrentEl().startingCoordY-c.offsetY == c.getHeight() {
-				c.offsetY++
+			if c.getCurrentEl().getAbsoluteEndingY() >= c.getHeight() {
+				// Try to fit next line.
+				c.offsetY = c.getCurrentEl().getSmallestOffsetToFitLineOnDisplay()
 				c.resyncBelow(c.data.Front())
 			} else {
 				c.resyncBelow(c.currentElement.Prev())
