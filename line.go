@@ -41,21 +41,25 @@ func (l *Line) getRelativeBlinkerCoordsByPos() (int, int) {
 	return x, y
 }
 
-func (l *Line) getSmallestOffsetToFitLineOnDisplay() int {
-	h := l.calculateHeight()
-	// last chars are on last display line: lineH + startingY - offsetY - 1 == displayH - 1
-	offset := h + l.startingCoordY - l.display.getHeight()
-	if offset < 0 {
-		return 0
+func (l *Line) makeSmallestOffsetToFitLineOnDisplay() {
+	// If heigh is too big, start it from first line.
+	if l.calculateHeight() > l.display.getHeight() {
+		l.display.offsetY = l.startingCoordY
+	} else {
+		// Otherwise last chars are on last display line: lineH + startingY - offsetY - 1 == displayH - 1
+		offset := l.calculateHeight() + l.startingCoordY - l.display.getHeight()
+		if offset < 0 {
+			l.display.offsetY = 0
+		} else {
+			l.display.offsetY = offset
+		}
 	}
-
-	return offset
 }
 
-func (l *Line) getAbsoluteStartingY() int {
+func (l *Line) getOnScreenStartingY() int {
 	return l.startingCoordY - l.display.offsetY
 }
-func (l *Line) getAbsoluteEndingY() int {
+func (l *Line) getOnScreenEndingY() int {
 	return l.startingCoordY - l.display.offsetY + l.calculateHeight() - 1
 }
 

@@ -39,7 +39,7 @@ func (e *Editor) initData(filename string) {
 	for i, field := range fields {
 		if i == 0 {
 			e.display.getCurrentEl().data = []rune(field)
-			e.display.getCurrentEl().pos = len(field)
+			e.display.getCurrentEl().pos = 0
 		} else {
 			newItem := Line{data: []rune(field), startingCoordY: -1, height: -1, pos: 0, display: e.display}
 			e.display.data.InsertAfter(&newItem, e.display.currentElement)
@@ -47,11 +47,8 @@ func (e *Editor) initData(filename string) {
 		}
 	}
 
-	e.display.resyncBelow(e.display.data.Front())
-
-	// Leave it at the end
-	e.display.currentElement = e.display.data.Back()
-	e.display.getCurrentEl().pos = len(e.display.getCurrentEl().data)
+	e.display.currentElement = e.display.data.Front()
+	e.display.resyncBelow(e.display.currentElement)
 	e.display.syncCoords()
 }
 

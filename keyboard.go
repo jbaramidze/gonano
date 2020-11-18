@@ -30,6 +30,10 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 				pos := c.getCurrentEl().pos
 				c.currentElement = c.currentElement.Prev()
 				c.getCurrentEl().pos = minOf(len(c.getCurrentEl().data), pos)
+				if c.getCurrentEl().getOnScreenStartingY() < 0 {
+					c.offsetY = c.getCurrentEl().startingCoordY
+					c.resyncBelow(c.data.Front())
+				}
 				c.syncCoords()
 			}
 		}
@@ -39,6 +43,11 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 				pos := c.getCurrentEl().pos
 				c.currentElement = c.currentElement.Next()
 				c.getCurrentEl().pos = minOf(len(c.getCurrentEl().data), pos)
+				if c.getCurrentEl().getOnScreenEndingY() >= c.getHeight() {
+					// Try to fit next line.
+					c.getCurrentEl().makeSmallestOffsetToFitLineOnDisplay()
+					c.resyncBelow(c.data.Front())
+				}
 				c.syncCoords()
 			}
 		}
@@ -56,9 +65,9 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 			cur.data = cur.data[:cur.pos] // we can optimize memory here, by duplicating it.
 			c.currentElement = c.currentElement.Next()
 
-			if c.getCurrentEl().getAbsoluteEndingY() >= c.getHeight() {
+			if c.getCurrentEl().getOnScreenEndingY() >= c.getHeight() {
 				// Try to fit next line.
-				c.offsetY = c.getCurrentEl().getSmallestOffsetToFitLineOnDisplay()
+				c.getCurrentEl().makeSmallestOffsetToFitLineOnDisplay()
 				c.resyncBelow(c.data.Front())
 			} else {
 				c.resyncBelow(c.currentElement.Prev())
