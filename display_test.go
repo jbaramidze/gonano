@@ -251,11 +251,34 @@ func TestDeletes(t *testing.T) {
 	expectPositionOnScreen(ctx, 0, 0)
 }
 
-// func TestScreenShift(t *testing.T) {
-// 	resp := make(chan bool)
-// 	h, e := initEditor(resp)
-// 	ctx := context{h: h, resp: resp, t: t, e: e}
-// }
+func TestScreenShift(t *testing.T) {
+	resp := make(chan bool)
+	h, e := initEditor(resp)
+	ctx := context{h: h, resp: resp, t: t, e: e}
+
+	sendChar(ctx, 's')
+	sendKey(ctx, tcell.KeyEnter)
+	sendKey(ctx, tcell.KeyEnter)
+	sendKey(ctx, tcell.KeyEnter)
+	sendKey(ctx, tcell.KeyEnter)
+	sendKey(ctx, tcell.KeyEnter)
+	sendChar(ctx, 'a')
+
+	expectScreen(ctx, [][]rune{{'s', '@', '@', '@'}, emptyRow, emptyRow, emptyRow, emptyRow, {'a', '@', '@', '@'}})
+
+	// Screen shifts below by 1
+	sendKey(ctx, tcell.KeyEnter)
+	expectScreen(ctx, [][]rune{emptyRow, emptyRow, emptyRow, emptyRow, {'a', '@', '@', '@'}, emptyRow})
+	sendChar(ctx, 'b')
+	expectScreen(ctx, [][]rune{emptyRow, emptyRow, emptyRow, emptyRow, {'a', '@', '@', '@'}, {'b', '@', '@', '@'}})
+
+	sendChar(ctx, 'c')
+	sendChar(ctx, 'd')
+
+	// Causes crash, fix it!
+	//sendChar(ctx, 'e')
+	//expectScreen(ctx, [][]rune{emptyRow, emptyRow, emptyRow, emptyRow, {'a', '@', '@', '@'}, {'b', 'c', 'd', 'e'}})
+}
 
 func TestBasic2(t *testing.T) {
 	resp := make(chan bool)
