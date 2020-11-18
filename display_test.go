@@ -7,7 +7,7 @@ import (
 	"github.com/gdamore/tcell"
 )
 
-var emptyRow []rune = []rune{0, 0, 0, 0}
+var emptyRow []rune = []rune{'@', '@', '@', '@'}
 
 func initEditor(resp chan bool) (*mockScreenHandler, *Editor) {
 	handler := initMockScreenHandler()
@@ -90,18 +90,18 @@ func TestBasic1(t *testing.T) {
 
 	// Test typing at the end of line, overflowing
 	sendChar(ctx, 'a')
-	expectScreen(ctx, [][]rune{{'a', 0, 0, 0}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{'a', '@', '@', '@'}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{'a'}})
 	expectPositionOnScreen(ctx, 1, 0)
 
 	sendChar(ctx, 'b')
-	expectScreen(ctx, [][]rune{{'a', 'b', 0, 0}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{'a', 'b', '@', '@'}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b'}})
 	expectPositionOnScreen(ctx, 2, 0)
 	expectLineAndPosition(ctx, 0, 2)
 
 	sendChar(ctx, 'c')
-	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 0}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{'a', 'b', 'c', '@'}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b', 'c'}})
 	expectPositionOnScreen(ctx, 3, 0)
 
@@ -111,20 +111,20 @@ func TestBasic1(t *testing.T) {
 	expectPositionOnScreen(ctx, 0, 1)
 
 	sendChar(ctx, 'e')
-	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'd'}, {'e', 0, 0, 0}, emptyRow, emptyRow, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'd'}, {'e', '@', '@', '@'}, emptyRow, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b', 'c', 'd', 'e'}})
 	expectPositionOnScreen(ctx, 1, 1)
 
 	// Test newline on last line
 	sendKey(ctx, tcell.KeyEnter)
-	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'd'}, {'e', 0, 0, 0}, emptyRow, emptyRow, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'd'}, {'e', '@', '@', '@'}, emptyRow, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b', 'c', 'd', 'e'}, {}})
 	expectPositionOnScreen(ctx, 0, 2)
 
 	sendChar(ctx, 'f')
 	sendChar(ctx, 'g')
 	sendChar(ctx, 'h')
-	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'd'}, {'e', 0, 0, 0}, {'f', 'g', 'h', 0}, emptyRow, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'd'}, {'e', '@', '@', '@'}, {'f', 'g', 'h', '@'}, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b', 'c', 'd', 'e'}, {'f', 'g', 'h'}})
 	expectPositionOnScreen(ctx, 3, 2)
 	expectLineAndPosition(ctx, 1, 3)
@@ -177,27 +177,27 @@ func TestBasic1(t *testing.T) {
 	*/
 	// Type at the beginning of line
 	sendChar(ctx, 'i')
-	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'd'}, {'e', 0, 0, 0}, {'i', 'f', 'g', 'h'}, emptyRow, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'd'}, {'e', '@', '@', '@'}, {'i', 'f', 'g', 'h'}, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b', 'c', 'd', 'e'}, {'i', 'f', 'g', 'h'}})
 	expectPositionOnScreen(ctx, 1, 2)
 	expectLineAndPosition(ctx, 1, 1)
 
 	sendChar(ctx, 'j')
-	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'd'}, {'e', 0, 0, 0}, {'i', 'j', 'f', 'g'}, {'h', 0, 0, 0}, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'd'}, {'e', '@', '@', '@'}, {'i', 'j', 'f', 'g'}, {'h', '@', '@', '@'}, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b', 'c', 'd', 'e'}, {'i', 'j', 'f', 'g', 'h'}})
 	expectPositionOnScreen(ctx, 2, 2)
 	expectLineAndPosition(ctx, 1, 2)
 
 	// Enter in the middle of line
 	sendKey(ctx, tcell.KeyEnter)
-	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'd'}, {'e', 0, 0, 0}, {'i', 'j', 0, 0}, {'f', 'g', 'h', 0}, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'd'}, {'e', '@', '@', '@'}, {'i', 'j', '@', '@'}, {'f', 'g', 'h', '@'}, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b', 'c', 'd', 'e'}, {'i', 'j'}, {'f', 'g', 'h'}})
 	expectPositionOnScreen(ctx, 0, 3)
 	expectLineAndPosition(ctx, 2, 0)
 
 	// Enter for empty line
 	sendKey(ctx, tcell.KeyEnter)
-	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'd'}, {'e', 0, 0, 0}, {'i', 'j', 0, 0}, emptyRow, {'f', 'g', 'h', 0}, emptyRow})
+	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'd'}, {'e', '@', '@', '@'}, {'i', 'j', '@', '@'}, emptyRow, {'f', 'g', 'h', '@'}, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b', 'c', 'd', 'e'}, {'i', 'j'}, {}, {'f', 'g', 'h'}})
 	expectPositionOnScreen(ctx, 0, 4)
 	expectLineAndPosition(ctx, 3, 0)
@@ -217,7 +217,7 @@ func TestDeletes(t *testing.T) {
 	sendChar(ctx, 'c')
 
 	sendKey(ctx, tcell.KeyDEL)
-	expectScreen(ctx, [][]rune{{'a', 'b', 0, 0}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{'a', 'b', '@', '@'}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b'}})
 	expectPositionOnScreen(ctx, 2, 0)
 
@@ -225,22 +225,22 @@ func TestDeletes(t *testing.T) {
 	sendKey(ctx, tcell.KeyEnter)
 	sendChar(ctx, 'd')
 	sendChar(ctx, 'e')
-	expectScreen(ctx, [][]rune{{'a', 'b', 0, 0}, {'d', 'e', 0, 0}, emptyRow, emptyRow, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{'a', 'b', '@', '@'}, {'d', 'e', '@', '@'}, emptyRow, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b'}, {'d', 'e'}})
 	expectPositionOnScreen(ctx, 2, 1)
 
 	sendKey(ctx, tcell.KeyDEL)
-	expectScreen(ctx, [][]rune{{'a', 'b', 0, 0}, {'d', 0, 0, 0}, emptyRow, emptyRow, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{'a', 'b', '@', '@'}, {'d', '@', '@', '@'}, emptyRow, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b'}, {'d'}})
 	expectPositionOnScreen(ctx, 1, 1)
 
 	sendKey(ctx, tcell.KeyDEL)
-	expectScreen(ctx, [][]rune{{'a', 'b', 0, 0}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{'a', 'b', '@', '@'}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b'}, {}})
 	expectPositionOnScreen(ctx, 0, 1)
 
 	sendKey(ctx, tcell.KeyDEL)
-	expectScreen(ctx, [][]rune{{'a', 'b', 0, 0}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{'a', 'b', '@', '@'}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b'}})
 	expectPositionOnScreen(ctx, 2, 0)
 
@@ -277,7 +277,7 @@ func TestBasic2(t *testing.T) {
 	sendChar(ctx, 'i')
 
 	// Make sure we good
-	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 0}, {'d', 0, 0, 0}, {'e', 'f', 'g', 'h'}, {'i', 0, 0, 0}, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{'a', 'b', 'c', '@'}, {'d', '@', '@', '@'}, {'e', 'f', 'g', 'h'}, {'i', '@', '@', '@'}, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b', 'c'}, {'d'}, {'e', 'f', 'g', 'h', 'i'}})
 	expectPositionOnScreen(ctx, 1, 3)
 	expectLineAndPosition(ctx, 2, 5)
@@ -293,12 +293,12 @@ func TestBasic2(t *testing.T) {
 
 	// Text full, console newline but still no shift
 	sendChar(ctx, 'j')
-	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'j'}, {'d', 0, 0, 0}, {'e', 'f', 'g', 'h'}, {'i', 0, 0, 0}, emptyRow, emptyRow})
+	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'j'}, {'d', '@', '@', '@'}, {'e', 'f', 'g', 'h'}, {'i', '@', '@', '@'}, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b', 'c', 'j'}, {'d'}, {'e', 'f', 'g', 'h', 'i'}})
 
 	// Shift happening
 	sendChar(ctx, 'k')
-	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'j'}, {'k', 0, 0, 0}, {'d', 0, 0, 0}, {'e', 'f', 'g', 'h'}, {'i', 0, 0, 0}, emptyRow})
+	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'j'}, {'k', '@', '@', '@'}, {'d', '@', '@', '@'}, {'e', 'f', 'g', 'h'}, {'i', '@', '@', '@'}, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b', 'c', 'j', 'k'}, {'d'}, {'e', 'f', 'g', 'h', 'i'}})
 	sendKey(ctx, tcell.KeyCtrlF)
 }

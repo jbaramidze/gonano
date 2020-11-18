@@ -36,10 +36,10 @@ func (r *realBlinker) clear() {
 			if len(r.d.getNextEl().data) > 0 {
 				r.d.screen.putStr(r.d.currentX, r.d.currentY, r.d.getNextEl().data[0])
 			} else {
-				r.d.screen.putStr(r.d.currentX, r.d.currentY, rune(0))
+				r.d.screen.clearStr(r.d.currentX, r.d.currentY)
 			}
 		} else {
-			r.d.screen.putStr(r.d.currentX, r.d.currentY, rune(0))
+			r.d.screen.clearStr(r.d.currentX, r.d.currentY)
 		}
 	}
 }

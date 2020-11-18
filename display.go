@@ -133,7 +133,7 @@ func (c *Display) resyncBelow(from *list.Element) {
 
 	for ; startingY-c.offsetY < c.getHeight(); startingY++ {
 		for i := 0; i < c.getWidth(); i++ {
-			c.screen.putStr(i, startingY, rune(0))
+			c.screen.clearStr(i, startingY)
 		}
 	}
 }
@@ -199,7 +199,7 @@ func (c *Display) drawText(text []string) {
 		c.screen.putStr(startX, h/2+j, rune('*'))
 		// spaces
 		for i := startX + 1; i < internalStartX; i++ {
-			c.screen.putStr(i, h/2+j, rune(0))
+			c.screen.clearStr(i, h/2+j)
 		}
 		// text
 		for i, ch := range text[j] {
@@ -207,7 +207,7 @@ func (c *Display) drawText(text []string) {
 		}
 		// spaces after text
 		for i := internalEndX; i < endX-1; i++ {
-			c.screen.putStr(i, h/2+j, rune(0))
+			c.screen.clearStr(i, h/2+j)
 		}
 		// last *
 		c.screen.putStr(endX-1, h/2+j, rune('*'))

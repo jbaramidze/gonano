@@ -92,7 +92,7 @@ func (l *Line) resync() {
 			}
 			y := l.startingCoordY + i - l.display.offsetY
 			if y >= 0 {
-				l.display.screen.putStr(j, y, 0)
+				l.display.screen.clearStr(j, y)
 			}
 		}
 	}
