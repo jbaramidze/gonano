@@ -56,15 +56,26 @@ func (l *Line) makeSmallestOffsetToFitLineOnDisplay() {
 	}
 }
 
-func (l *Line) getOnScreenStartingY() int {
+func (l *Line) getOnScreenLineStartingY() int {
 	return l.startingCoordY - l.display.offsetY
 }
-func (l *Line) getOnScreenEndingY() int {
+func (l *Line) getOnScreenLineEndingY() int {
 	return l.startingCoordY - l.display.offsetY + l.calculateHeight() - 1
 }
 
-func (l *Line) getCurrentY() int {
+func (l *Line) getRelativeCursorY() int {
 	return l.pos / l.display.getWidth()
+}
+
+func (l *Line) getOnScreenCursorY() int {
+	return l.startingCoordY - l.display.offsetY + l.getRelativeCursorY()
+}
+
+func (l *Line) getRelativeCharBeforeCursorY() int {
+	if l.pos == 0 {
+		return 0
+	}
+	return (l.pos - 1) / l.display.getWidth()
 }
 
 func (l *Line) calculateHeight() int {

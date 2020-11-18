@@ -30,7 +30,7 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 				pos := c.getCurrentEl().pos
 				c.currentElement = c.currentElement.Prev()
 				c.getCurrentEl().pos = minOf(len(c.getCurrentEl().data), pos)
-				if c.getCurrentEl().getOnScreenStartingY() < 0 {
+				if c.getCurrentEl().getOnScreenLineStartingY() < 0 {
 					c.offsetY = c.getCurrentEl().startingCoordY
 					c.resyncBelow(c.data.Front())
 				}
@@ -43,7 +43,7 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 				pos := c.getCurrentEl().pos
 				c.currentElement = c.currentElement.Next()
 				c.getCurrentEl().pos = minOf(len(c.getCurrentEl().data), pos)
-				if c.getCurrentEl().getOnScreenEndingY() >= c.getHeight() {
+				if c.getCurrentEl().getOnScreenLineEndingY() >= c.getHeight() {
 					// Try to fit next line.
 					c.getCurrentEl().makeSmallestOffsetToFitLineOnDisplay()
 					c.resyncBelow(c.data.Front())
@@ -58,20 +58,22 @@ func (c *Display) handleKeyPress(op TypeOperation) {
 			// Create new line
 			newData := make([]rune, len(cur.data)-cur.pos)
 			copy(newData, cur.data[cur.pos:])
-			newItem := Line{data: newData, startingCoordY: cur.startingCoordY + cur.getCurrentY() + 1, height: -1, pos: 0, display: c}
+			newItem := Line{data: newData, startingCoordY: cur.startingCoordY + cur.getRelativeCharBeforeCursorY() + 1, height: -1, pos: 0, display: c}
 
+			log.Println(newItem.startingCoordY)
 			c.data.InsertAfter(&newItem, c.currentElement)
 
 			cur.data = cur.data[:cur.pos] // we can optimize memory here, by duplicating it.
 			c.currentElement = c.currentElement.Next()
 
-			if c.getCurrentEl().getOnScreenEndingY() >= c.getHeight() {
+			if c.getCurrentEl().getOnScreenLineEndingY() >= c.getHeight() {
 				// Try to fit next line.
 				c.getCurrentEl().makeSmallestOffsetToFitLineOnDisplay()
 				c.resyncBelow(c.data.Front())
 			} else {
 				c.resyncBelow(c.currentElement.Prev())
 			}
+			log.Println(newItem.startingCoordY)
 			c.syncCoords()
 		}
 	case tcell.KeyDEL:
