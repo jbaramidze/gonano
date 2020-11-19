@@ -17,7 +17,7 @@ func initEditor(resp chan bool) (*mockScreenHandler, *Editor) {
 	editor.setBlinker(blinkr)
 
 	go editor.startLoop()
-	defer editor.display.Close()
+	defer editor.display.close()
 
 	go editor.pollKeyboard(resp)
 

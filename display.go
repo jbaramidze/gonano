@@ -13,7 +13,7 @@ type Display struct {
 	currentElement     *list.Element
 	screen             screenHandler
 	currentX, currentY int
-	monitorChannel     chan ContentOperation
+	monitorChannel     chan contentOperation
 	blinker            blinker
 	statusBar          statusBar
 	offsetY            int
@@ -59,7 +59,7 @@ func (c *Display) getNextEl() *Line {
 }
 
 func createDisplay(handler screenHandler) *Display {
-	channel := make(chan ContentOperation)
+	channel := make(chan contentOperation)
 	lst := list.New()
 	d := Display{screen: handler, data: lst, monitorChannel: channel}
 	lst.PushBack(d.newLine())
@@ -67,8 +67,7 @@ func createDisplay(handler screenHandler) *Display {
 	return &d
 }
 
-// Close display
-func (c *Display) Close() {
+func (c *Display) close() {
 	c.screen.close()
 }
 
@@ -77,7 +76,7 @@ func (c *Display) startLoop() {
 		op := <-c.monitorChannel
 		c.blinker.clear()
 		switch decoded := op.(type) {
-		case TypeOperation:
+		case typeOperation:
 			{
 				c.handleKeyPress(decoded)
 				c.blinker.refresh()
@@ -85,11 +84,11 @@ func (c *Display) startLoop() {
 					decoded.resp <- true
 				}
 			}
-		case BlinkOperation:
+		case blinkOperation:
 			{
 				c.blinker.refresh()
 			}
-		case AnnouncementOperation:
+		case announcementOperation:
 			{
 				c.statusBar.draw(decoded.text)
 				if decoded.resp != nil {
@@ -100,23 +99,19 @@ func (c *Display) startLoop() {
 	}
 }
 
-// ContentOperation s
-type ContentOperation interface{}
+type contentOperation interface{}
 
-// TypeOperation ss
-type TypeOperation struct {
+type typeOperation struct {
 	rn   rune
 	key  tcell.Key
 	resp chan bool
 }
 
-// BlinkOperation ss
-type BlinkOperation struct {
+type blinkOperation struct {
 	blink bool
 }
 
-// AnnouncementOperation ss
-type AnnouncementOperation struct {
+type announcementOperation struct {
 	text []string
 	resp chan bool
 }

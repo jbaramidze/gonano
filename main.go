@@ -24,7 +24,7 @@ func main() {
 	editor.setStausBar(statusBar)
 
 	go editor.startLoop()
-	defer editor.display.Close()
+	defer editor.display.close()
 
 	editor.pollKeyboard(nil)
 }

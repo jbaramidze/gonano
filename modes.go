@@ -37,7 +37,7 @@ func (m normalMode) handleKeyPress(ev keyEvent, resp chan bool) (exit bool) {
 		if ev.k != tcell.KeyLeft && ev.k != tcell.KeyRight && ev.k != tcell.KeyUp && ev.k != tcell.KeyDown {
 			m.e.modified = true
 		}
-		m.e.display.monitorChannel <- TypeOperation{rn: ev.rn, key: ev.k, resp: resp}
+		m.e.display.monitorChannel <- typeOperation{rn: ev.rn, key: ev.k, resp: resp}
 	}
 
 	return false
@@ -52,7 +52,7 @@ func newQuitWithoutSavingMode(e *Editor) quitWithoutSavingMode {
 }
 
 func (m quitWithoutSavingMode) init() {
-	m.e.display.monitorChannel <- AnnouncementOperation{text: []string{"You will lose your changes!", "Are you sure you want to quit? Y/N"}}
+	m.e.display.monitorChannel <- announcementOperation{text: []string{"You will lose your changes!", "Are you sure you want to quit? Y/N"}}
 }
 
 func (m quitWithoutSavingMode) handleKeyPress(ev keyEvent, resp chan bool) (exit bool) {
@@ -80,7 +80,7 @@ func (m savedMode) init() {
 		return
 	}
 	m.e.modified = false
-	m.e.display.monitorChannel <- AnnouncementOperation{text: []string{"Saved!"}}
+	m.e.display.monitorChannel <- announcementOperation{text: []string{"Saved!"}}
 	go func() {
 		time.Sleep(3 * time.Second)
 		m.lock.Lock()

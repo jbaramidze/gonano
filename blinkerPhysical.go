@@ -38,12 +38,12 @@ func (r *realBlinker) clear() {
 
 func initRealBlinker(e *Editor) blinker {
 	b := &realBlinker{d: e.display, blinkIsSet: false}
-	go func(c chan ContentOperation) {
+	go func(c chan contentOperation) {
 		ticker := time.NewTicker(500 * time.Millisecond)
 		for {
 			<-ticker.C
 			b.blinkIsSet = !b.blinkIsSet
-			c <- BlinkOperation{blink: b.blinkIsSet}
+			c <- blinkOperation{blink: b.blinkIsSet}
 		}
 	}(e.display.monitorChannel)
 

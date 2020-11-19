@@ -12,7 +12,7 @@ func (c *Display) syncCoords() {
 	c.currentY = blinkerY + c.getCurrentEl().startingCoordY - c.offsetY
 }
 
-func (c *Display) handleKeyPress(op TypeOperation) {
+func (c *Display) handleKeyPress(op typeOperation) {
 	switch op.key {
 	case tcell.KeyLeft:
 		{
