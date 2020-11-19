@@ -64,10 +64,12 @@ func createDisplay(handler screenHandler) *Display {
 }
 
 func (c *Display) insert(char rune) {
+	oldH := c.getCurrentEl().getOnScreenLineEndingY()
 	oldCursorY := c.getCurrentEl().getRelativeCursorY()
 	c.getCurrentEl().data = insertInSlice(c.getCurrentEl().data, char, c.getCurrentEl().pos)
 	c.getCurrentEl().pos++
-	newCursorY := c.getCurrentEl().getRelativeCursorY()
+	newH := c.getCurrentEl().display.getHeight()
+	newCursorY := c.getCurrentEl().getOnScreenLineEndingY()
 
 	if oldCursorY != newCursorY {
 		onScreenCursorY := c.getCurrentEl().getOnScreenCursorY()
@@ -78,7 +80,11 @@ func (c *Display) insert(char rune) {
 			c.resyncBelow(c.currentElement)
 		}
 	} else {
-		c.getCurrentEl().resync()
+		if oldH != newH {
+			c.resyncBelow(c.currentElement)
+		} else {
+			c.getCurrentEl().resync()
+		}
 	}
 	c.syncCoords()
 }

@@ -275,7 +275,6 @@ func TestScreenShift(t *testing.T) {
 	sendChar(ctx, 'c')
 	sendChar(ctx, 'd')
 
-	// Causes crash, fix it!
 	sendChar(ctx, 'e')
 	expectScreen(ctx, [][]rune{emptyRow, emptyRow, emptyRow, {'a', '@', '@', '@'}, {'b', 'c', 'd', 'e'}, emptyRow})
 }
