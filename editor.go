@@ -94,3 +94,7 @@ func (e *Editor) setMode(mode mode) {
 func (e *Editor) setBlinker(b blinker) {
 	e.display.blinker = b
 }
+
+func (e *Editor) setStausBar(s statusBar) {
+	e.display.statusBar = s
+}

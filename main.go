@@ -19,7 +19,9 @@ func main() {
 	editor.initData(arg)
 
 	blinkr := initRealBlinker(editor)
+	statusBar := newPhysicalStatusBar(editor.display)
 	editor.setBlinker(blinkr)
+	editor.setStausBar(statusBar)
 
 	go editor.startLoop()
 	defer editor.display.Close()
