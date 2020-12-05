@@ -6,10 +6,14 @@ import (
 	"github.com/gdamore/tcell"
 )
 
-func (c *Display) syncCoords() {
-	blinkerX, blinkerY := c.getCurrentEl().getRelativeBlinkerCoordsByPos()
-	c.currentX = blinkerX
-	c.currentY = blinkerY + c.getCurrentEl().startingCoordY - c.offsetY
+func (c *Display) getBlinkerX() int {
+	blinkerX, _ := c.getCurrentEl().getRelativeBlinkerCoordsByPos()
+	return blinkerX
+}
+
+func (c *Display) getBlinkerY() int {
+	_, blinkerY := c.getCurrentEl().getRelativeBlinkerCoordsByPos()
+	return blinkerY + c.getCurrentEl().startingCoordY - c.offsetY
 }
 
 func (c *Display) handleKeyPress(op typeOperation) {
@@ -23,10 +27,10 @@ func (c *Display) handleKeyPress(op typeOperation) {
 			if oldCursorY != newCursorY {
 				c.resyncNewCursorY()
 			}
-			c.syncCoords()
 		}
 	case tcell.KeyRight:
 		{
+			log.Print(c.getCurrentEl().data)
 			oldCursorY := c.getCurrentEl().getRelativeCursorY()
 			c.getCurrentEl().moveRight()
 			newCursorY := c.getCurrentEl().getRelativeCursorY()
@@ -34,7 +38,6 @@ func (c *Display) handleKeyPress(op typeOperation) {
 			if oldCursorY != newCursorY {
 				c.resyncNewCursorY()
 			}
-			c.syncCoords()
 		}
 	case tcell.KeyUp:
 		{
@@ -46,7 +49,6 @@ func (c *Display) handleKeyPress(op typeOperation) {
 					c.offsetY = c.getCurrentEl().startingCoordY
 					c.resyncBelow(c.data.Front())
 				}
-				c.syncCoords()
 			}
 		}
 	case tcell.KeyDown:
@@ -60,7 +62,6 @@ func (c *Display) handleKeyPress(op typeOperation) {
 					c.getCurrentEl().makeSmallestOffsetToFitLineOnDisplay()
 					c.resyncBelow(c.data.Front())
 				}
-				c.syncCoords()
 			}
 		}
 	case tcell.KeyEnter:
@@ -86,7 +87,6 @@ func (c *Display) handleKeyPress(op typeOperation) {
 				c.resyncBelow(c.currentElement.Prev())
 			}
 			log.Println(newItem.startingCoordY)
-			c.syncCoords()
 		}
 	case tcell.KeyDEL:
 		{

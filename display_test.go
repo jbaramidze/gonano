@@ -1,6 +1,7 @@
 package main
 
 import (
+	"container/list"
 	"reflect"
 	"testing"
 
@@ -9,8 +10,8 @@ import (
 
 var emptyRow []rune = []rune{'@', '@', '@', '@'}
 
-func initEditor(resp chan bool) (*mockScreenHandler, *Editor) {
-	handler := initMockScreenHandler()
+func initEditor(resp chan bool, w, h int) (*mockScreenHandler, *Editor) {
+	handler := initMockScreenHandler(w, h)
 	editor := createEditor(handler)
 
 	blinkr := initMockBlinker(editor)
@@ -62,8 +63,8 @@ func expectData(ctx context, data [][]rune) {
 }
 
 func expectPositionOnScreen(ctx context, x int, y int) {
-	if ctx.e.display.currentX != x || ctx.e.display.currentY != y {
-		ctx.t.Errorf("Incorrect coords (%v, %v) vs (%v, %v)", ctx.e.display.currentX, ctx.e.display.currentY, x, y)
+	if ctx.e.display.getBlinkerX() != x || ctx.e.display.getBlinkerY() != y {
+		ctx.t.Errorf("Incorrect coords (%v, %v) vs (%v, %v)", ctx.e.display.getBlinkerX(), ctx.e.display.getBlinkerY(), x, y)
 	}
 }
 
@@ -83,12 +84,12 @@ func expectLineAndPosition(ctx context, line int, pos int) {
 
 func TestBasic1(t *testing.T) {
 	resp := make(chan bool)
-	h, e := initEditor(resp)
+	h, e := initEditor(resp, 4, 6)
 	ctx := context{h: h, resp: resp, t: t, e: e}
 
 	expectPositionOnScreen(ctx, 0, 0)
 
-	// Test typing at the end of line, overflowing
+	// Single line overflows by typing, enough space on screen
 	sendChar(ctx, 'a')
 	expectScreen(ctx, [][]rune{{'a', '@', '@', '@'}, emptyRow, emptyRow, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{'a'}})
@@ -115,7 +116,7 @@ func TestBasic1(t *testing.T) {
 	expectData(ctx, [][]rune{{'a', 'b', 'c', 'd', 'e'}})
 	expectPositionOnScreen(ctx, 1, 1)
 
-	// Test newline on last line
+	// Newline at last line, last character, enough space on screen
 	sendKey(ctx, tcell.KeyEnter)
 	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'd'}, {'e', '@', '@', '@'}, emptyRow, emptyRow, emptyRow, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b', 'c', 'd', 'e'}, {}})
@@ -205,7 +206,7 @@ func TestBasic1(t *testing.T) {
 
 func TestDeletes(t *testing.T) {
 	resp := make(chan bool)
-	h, e := initEditor(resp)
+	h, e := initEditor(resp, 4, 6)
 	ctx := context{h: h, resp: resp, t: t, e: e}
 
 	sendKey(ctx, tcell.KeyDEL)
@@ -253,7 +254,7 @@ func TestDeletes(t *testing.T) {
 
 func TestScreenShift(t *testing.T) {
 	resp := make(chan bool)
-	h, e := initEditor(resp)
+	h, e := initEditor(resp, 4, 6)
 	ctx := context{h: h, resp: resp, t: t, e: e}
 
 	sendChar(ctx, 's')
@@ -281,7 +282,7 @@ func TestScreenShift(t *testing.T) {
 
 func TestBasic2(t *testing.T) {
 	resp := make(chan bool)
-	h, e := initEditor(resp)
+	h, e := initEditor(resp, 4, 6)
 	ctx := context{h: h, resp: resp, t: t, e: e}
 
 	// Test case when first line starts overflowiing => further lines get shifted
@@ -323,4 +324,54 @@ func TestBasic2(t *testing.T) {
 	expectScreen(ctx, [][]rune{{'a', 'b', 'c', 'j'}, {'k', '@', '@', '@'}, {'d', '@', '@', '@'}, {'e', 'f', 'g', 'h'}, {'i', '@', '@', '@'}, emptyRow})
 	expectData(ctx, [][]rune{{'a', 'b', 'c', 'j', 'k'}, {'d'}, {'e', 'f', 'g', 'h', 'i'}})
 	sendKey(ctx, tcell.KeyCtrlF)
+}
+
+func testOperation(ctx context, data [][]rune, offsetY, curLine, pos int, key tcell.Key) (int, int, int) {
+	d := ctx.e.display
+	d.data = list.New()
+	for _, item := range data {
+		d.data.PushBack(&Line{data: item, startingCoordY: 0, height: -1, pos: 0, display: d})
+	}
+	ctx.e.offsetY = offsetY
+	d.currentElement = d.data.Front()
+	for i := 0; i < curLine; i++ {
+		d.currentElement = d.currentElement.Next()
+	}
+	d.getCurrentEl().pos = pos
+
+	d.recalcBelow(d.data.Front())
+
+	// Do the operation
+	sendKey(ctx, tcell.KeyRight)
+
+	currentLine := 0
+	p := d.getCurrentEl().pos
+	for d.currentElement != d.data.Front() {
+		currentLine++
+		d.currentElement = d.currentElement.Prev()
+	}
+	return ctx.e.offsetY, currentLine, p
+}
+
+func expectParams(ctx context, a, b, c, d, e, f int) {
+	if a != d || b != e || c != f {
+		ctx.t.Errorf("FAILED: %v!=%v or %v!=%v or %v!=%v", a, d, b, e, c, f)
+	}
+
+}
+
+func TestArrows(t *testing.T) {
+	resp := make(chan bool)
+	h, e := initEditor(resp, 2, 2)
+	ctx := context{h: h, resp: resp, t: t, e: e}
+
+	// /*
+	// 	Right arrow test
+	// */
+
+	// // Cannot go any more right
+	// // a, b, c := testOperation(ctx, [][]rune{{'a'}, {'b', 'c'}}, 0, 1, 2, tcell.KeyRight)
+	// // expectParams(ctx, a, b, c, 0, 1, 2)
+	a, b, c := testOperation(ctx, [][]rune{{'a'}, {'b', 'c', 'd', 'e'}}, 0, 1, 2, tcell.KeyRight)
+	expectParams(ctx, a, b, c, 0, 1, 2)
 }

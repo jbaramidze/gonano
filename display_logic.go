@@ -17,7 +17,6 @@ func (c *Display) insert(char rune) {
 			c.getCurrentEl().resync()
 		}
 	}
-	c.syncCoords()
 }
 
 func (c *Display) remove() {
@@ -46,6 +45,4 @@ func (c *Display) remove() {
 			c.getCurrentEl().resync()
 		}
 	}
-
-	c.syncCoords()
 }

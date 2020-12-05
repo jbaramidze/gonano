@@ -9,18 +9,17 @@ import (
 
 // Display ss
 type Display struct {
-	data               *list.List // list of *Line
-	currentElement     *list.Element
-	screen             screenHandler
-	currentX, currentY int
-	monitorChannel     chan contentOperation
-	blinker            blinker
-	statusBar          statusBar
-	offsetY            int
+	data           *list.List // list of *Line
+	currentElement *list.Element
+	screen         screenHandler
+	monitorChannel chan contentOperation
+	blinker        blinker
+	statusBar      statusBar
+	offsetY        int
 }
 
 func (c *Display) dump() {
-	log.Printf("Current: x:%v, y:%v", c.currentX, c.currentY)
+	log.Printf("Current: x:%v, y:%v", c.getBlinkerX(), c.getBlinkerY())
 	log.Println("Dumping lines:")
 	for i, e := 0, c.data.Front(); e != nil; i, e = i+1, e.Next() {
 		l := e.Value.(*Line)

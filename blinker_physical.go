@@ -16,22 +16,22 @@ func (r *realBlinker) refresh() {
 }
 
 func (r *realBlinker) set() {
-	r.d.screen.putStr(r.d.currentX, r.d.currentY, rune('▉'))
+	r.d.screen.putStr(r.d.getBlinkerX(), r.d.getBlinkerY(), rune('▉'))
 }
 
 func (r *realBlinker) clear() {
 	if len(r.d.getCurrentEl().data) > r.d.getCurrentEl().pos {
-		r.d.screen.putStr(r.d.currentX, r.d.currentY, r.d.getCurrentEl().getCurrentChar())
+		r.d.screen.putStr(r.d.getBlinkerX(), r.d.getBlinkerY(), r.d.getCurrentEl().getCurrentChar())
 	} else {
 		// FIXME: exception: it might be on beginning of another line. Fix the case.
-		if r.d.currentX == 0 && r.d.hasNextEl() && r.d.currentY == r.d.getNextEl().startingCoordY {
+		if r.d.getBlinkerX() == 0 && r.d.hasNextEl() && r.d.getBlinkerY() == r.d.getNextEl().startingCoordY {
 			if len(r.d.getNextEl().data) > 0 {
-				r.d.screen.putStr(r.d.currentX, r.d.currentY, r.d.getNextEl().data[0])
+				r.d.screen.putStr(r.d.getBlinkerX(), r.d.getBlinkerY(), r.d.getNextEl().data[0])
 			} else {
-				r.d.screen.clearStr(r.d.currentX, r.d.currentY)
+				r.d.screen.clearStr(r.d.getBlinkerX(), r.d.getBlinkerY())
 			}
 		} else {
-			r.d.screen.clearStr(r.d.currentX, r.d.currentY)
+			r.d.screen.clearStr(r.d.getBlinkerX(), r.d.getBlinkerY())
 		}
 	}
 }

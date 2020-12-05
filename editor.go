@@ -49,7 +49,6 @@ func (e *Editor) initData(filename string) {
 
 	e.display.currentElement = e.display.data.Front()
 	e.display.resyncBelow(e.display.currentElement)
-	e.display.syncCoords()
 }
 
 func (e *Editor) saveData() error {
@@ -80,7 +79,6 @@ func (e *Editor) pollKeyboard(resp chan bool) {
 			}
 		case resizeEvent:
 			e.display.resyncBelow(e.display.data.Front())
-			e.display.syncCoords()
 		}
 
 	}
