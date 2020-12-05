@@ -1,7 +1,5 @@
 package main
 
-import "log"
-
 type statusBar interface {
 	draw(text []string)
 }
@@ -15,7 +13,6 @@ func newPhysicalStatusBar(d *Display) *physicalStatusBar {
 }
 
 func (s *physicalStatusBar) draw(text []string) {
-	log.Println(text)
 	h := s.d.getHeight()
 	w := s.d.getWidth()
 

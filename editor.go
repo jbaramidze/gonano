@@ -12,7 +12,6 @@ type Editor struct {
 	filename string
 	modified bool
 	mode     mode
-	offsetY  int
 }
 
 func createEditor(handler screenHandler) *Editor {

@@ -326,13 +326,13 @@ func TestBasic2(t *testing.T) {
 	sendKey(ctx, tcell.KeyCtrlF)
 }
 
-func testOperation(ctx context, data [][]rune, offsetY, curLine, pos int, key tcell.Key) (int, int, int) {
+func setupScenario(ctx context, data [][]rune, offsetY, curLine, pos int) {
 	d := ctx.e.display
 	d.data = list.New()
 	for _, item := range data {
 		d.data.PushBack(&Line{data: item, startingCoordY: 0, height: -1, pos: 0, display: d})
 	}
-	ctx.e.offsetY = offsetY
+	d.offsetY = offsetY
 	d.currentElement = d.data.Front()
 	for i := 0; i < curLine; i++ {
 		d.currentElement = d.currentElement.Next()
@@ -340,38 +340,72 @@ func testOperation(ctx context, data [][]rune, offsetY, curLine, pos int, key tc
 	d.getCurrentEl().pos = pos
 
 	d.recalcBelow(d.data.Front())
+}
 
-	// Do the operation
-	sendKey(ctx, tcell.KeyRight)
+func expectParams(ctx context, expectY, expectLine, expectPos int) {
+	d := ctx.e.display
+
+	if expectY != d.offsetY {
+		ctx.t.Errorf("Incorrect OffsetY! Expected %v actual %v", expectY, d.offsetY)
+		return
+	}
 
 	currentLine := 0
-	p := d.getCurrentEl().pos
-	for d.currentElement != d.data.Front() {
+	for t := d.data.Front(); t != d.currentElement; t = t.Next() {
 		currentLine++
-		d.currentElement = d.currentElement.Prev()
 	}
-	return ctx.e.offsetY, currentLine, p
-}
-
-func expectParams(ctx context, a, b, c, d, e, f int) {
-	if a != d || b != e || c != f {
-		ctx.t.Errorf("FAILED: %v!=%v or %v!=%v or %v!=%v", a, d, b, e, c, f)
+	if expectLine != currentLine {
+		ctx.t.Errorf("Incorrect currentLine! Expected %v actual %v", expectLine, currentLine)
+		return
 	}
 
+	if expectPos != d.getCurrentEl().pos {
+		ctx.t.Errorf("Incorrect pos! Expected %v actual %v", expectPos, d.getCurrentEl().pos)
+		return
+	}
 }
 
-func TestArrows(t *testing.T) {
+func TestArrow(t *testing.T) {
 	resp := make(chan bool)
 	h, e := initEditor(resp, 2, 2)
 	ctx := context{h: h, resp: resp, t: t, e: e}
 
-	// /*
-	// 	Right arrow test
-	// */
+	/*
+		Right arrow test
+	*/
 
-	// // Cannot go any more right
-	// // a, b, c := testOperation(ctx, [][]rune{{'a'}, {'b', 'c'}}, 0, 1, 2, tcell.KeyRight)
-	// // expectParams(ctx, a, b, c, 0, 1, 2)
-	a, b, c := testOperation(ctx, [][]rune{{'a'}, {'b', 'c', 'd', 'e'}}, 0, 1, 2, tcell.KeyRight)
-	expectParams(ctx, a, b, c, 0, 1, 2)
+	// Can go more right
+	setupScenario(ctx, [][]rune{{'a'}, {'b', 'c', 'd', 'e'}}, 1, 1, 2)
+	sendKey(ctx, tcell.KeyRight)
+	expectParams(ctx, 1, 1, 3)
+
+	// Cannot go any more right
+	setupScenario(ctx, [][]rune{{'a'}, {'b', 'c'}}, 1, 1, 2)
+	sendKey(ctx, tcell.KeyRight)
+	expectParams(ctx, 1, 1, 2)
+
+	// If on last char, can cause offsetY increase
+	setupScenario(ctx, [][]rune{{'a'}, {'b', 'c', 'd', 'e'}}, 0, 1, 1)
+	sendKey(ctx, tcell.KeyRight)
+	expectParams(ctx, 1, 1, 2)
+
+	/*
+		Left arrow test
+	*/
+
+	// Can go more left
+	setupScenario(ctx, [][]rune{{'a'}, {'b', 'c', 'd', 'e'}}, 1, 1, 2)
+	sendKey(ctx, tcell.KeyLeft)
+	expectParams(ctx, 1, 1, 1)
+
+	// Cannot go more left
+	setupScenario(ctx, [][]rune{{'a'}, {'b', 'c', 'd', 'e'}}, 1, 1, 0)
+	sendKey(ctx, tcell.KeyLeft)
+	expectParams(ctx, 1, 1, 0)
+
+	// If on first char on screen, can cause offsetY decrease
+	setupScenario(ctx, [][]rune{{'a'}, {'b', 'c', 'd', 'e'}}, 2, 1, 2)
+	sendKey(ctx, tcell.KeyLeft)
+	expectParams(ctx, 1, 1, 1)
+
 }

@@ -1,6 +1,8 @@
 package main
 
-import "container/list"
+import (
+	"container/list"
+)
 
 // Current line should have correct startingY !
 func (c *Display) resyncBelow(from *list.Element) {
@@ -39,6 +41,9 @@ func (c *Display) resyncNewCursorY() {
 	// If cursor jumped below screen
 	if onScreenCursorY >= c.getHeight() {
 		c.offsetY++
+		c.resyncBelow(c.data.Front())
+	} else if onScreenCursorY < 0 {
+		c.offsetY--
 		c.resyncBelow(c.data.Front())
 	} else {
 		c.resyncBelow(c.currentElement)

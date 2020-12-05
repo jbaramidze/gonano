@@ -30,7 +30,6 @@ func (c *Display) handleKeyPress(op typeOperation) {
 		}
 	case tcell.KeyRight:
 		{
-			log.Print(c.getCurrentEl().data)
 			oldCursorY := c.getCurrentEl().getRelativeCursorY()
 			c.getCurrentEl().moveRight()
 			newCursorY := c.getCurrentEl().getRelativeCursorY()
@@ -73,7 +72,6 @@ func (c *Display) handleKeyPress(op typeOperation) {
 			copy(newData, cur.data[cur.pos:])
 			newItem := Line{data: newData, startingCoordY: cur.startingCoordY + cur.getRelativeCharBeforeCursorY() + 1, height: -1, pos: 0, display: c}
 
-			log.Println(newItem.startingCoordY)
 			c.data.InsertAfter(&newItem, c.currentElement)
 
 			cur.data = cur.data[:cur.pos] // we can optimize memory here, by duplicating it.
@@ -86,7 +84,6 @@ func (c *Display) handleKeyPress(op typeOperation) {
 			} else {
 				c.resyncBelow(c.currentElement.Prev())
 			}
-			log.Println(newItem.startingCoordY)
 		}
 	case tcell.KeyDEL:
 		{
