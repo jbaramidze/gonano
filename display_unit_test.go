@@ -8,7 +8,7 @@ import (
 
 func TestArrow(t *testing.T) {
 	resp := make(chan bool)
-	h, e := initEditor(resp, 2, 2)
+	h, e := initEditor(resp, 3, 3)
 	ctx := context{h: h, resp: resp, t: t, e: e}
 
 	/*
@@ -26,9 +26,9 @@ func TestArrow(t *testing.T) {
 	expectParams(ctx, 1, 1, 2)
 
 	// If on last char, can cause offsetY increase
-	setupScenario(ctx, [][]rune{{'a'}, {'b', 'c', 'd', 'e'}}, 0, 1, 1)
+	setupScenario(ctx, [][]rune{{'a', 'b', 'c', 'd'}, {'b', 'c', 'd', 'e'}}, 0, 1, 2)
 	sendKey(ctx, tcell.KeyRight)
-	expectParams(ctx, 1, 1, 2)
+	expectParams(ctx, 1, 1, 3)
 
 	/*
 		Left arrow test
@@ -45,8 +45,41 @@ func TestArrow(t *testing.T) {
 	expectParams(ctx, 1, 1, 0)
 
 	// If on first char on screen, can cause offsetY decrease
-	setupScenario(ctx, [][]rune{{'a'}, {'b', 'c', 'd', 'e'}}, 2, 1, 2)
+	setupScenario(ctx, [][]rune{{'a', 'b', 'c', 'd'}, {'b', 'c', 'd', 'e'}}, 3, 1, 3)
 	sendKey(ctx, tcell.KeyLeft)
-	expectParams(ctx, 1, 1, 1)
+	expectParams(ctx, 2, 1, 2)
 
+	/*
+		Down arrow test
+	*/
+
+	// Cannot go more down
+	setupScenario(ctx, [][]rune{{'a', 'b'}, {'b', 'c', 'd', 'e'}}, 1, 1, 2)
+	sendKey(ctx, tcell.KeyDown)
+	expectParams(ctx, 1, 1, 2)
+
+	// Move to next longer line
+	setupScenario(ctx, [][]rune{{'a', 'b'}, {'b', 'c', 'd'}}, 0, 0, 2)
+	sendKey(ctx, tcell.KeyDown)
+	expectParams(ctx, 0, 1, 2)
+
+	// Move to next shorter line
+	setupScenario(ctx, [][]rune{{'a', 'b', 'c'}, {'b', 'c'}}, 0, 0, 3)
+	sendKey(ctx, tcell.KeyDown)
+	expectParams(ctx, 0, 1, 2)
+
+	// Move to next line: visible beginning, non-visible end, fits screen
+	setupScenario(ctx, [][]rune{{'a'}, {'a'}, {'a', 'b', 'c', 'd'}}, 0, 1, 1)
+	sendKey(ctx, tcell.KeyDown)
+	expectParams(ctx, 1, 2, 1)
+
+	// Move to next line: visible beginning, non-visible end, does not fit screen V1
+	setupScenario(ctx, [][]rune{{'a'}, {'a'}, {'a', 'b', 'c', 'd', 'e', 'f', 'g'}}, 0, 1, 1)
+	sendKey(ctx, tcell.KeyDown)
+	expectParams(ctx, 2, 2, 1)
+
+	// Move to next line: visible beginning, non-visible end, does not fit screen V2
+	setupScenario(ctx, [][]rune{{'a'}, {'a'}, {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'i', 'j', 'k', 'l', 'm', 'n'}}, 0, 1, 1)
+	sendKey(ctx, tcell.KeyDown)
+	expectParams(ctx, 2, 2, 1)
 }
