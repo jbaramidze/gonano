@@ -16,12 +16,24 @@ func (c *Display) handleKeyPress(op typeOperation) {
 	switch op.key {
 	case tcell.KeyLeft:
 		{
+			oldCursorY := c.getCurrentEl().getRelativeCursorY()
 			c.getCurrentEl().moveLeft()
+			newCursorY := c.getCurrentEl().getRelativeCursorY()
+
+			if oldCursorY != newCursorY {
+				c.resyncNewCursorY()
+			}
 			c.syncCoords()
 		}
 	case tcell.KeyRight:
 		{
+			oldCursorY := c.getCurrentEl().getRelativeCursorY()
 			c.getCurrentEl().moveRight()
+			newCursorY := c.getCurrentEl().getRelativeCursorY()
+
+			if oldCursorY != newCursorY {
+				c.resyncNewCursorY()
+			}
 			c.syncCoords()
 		}
 	case tcell.KeyUp:

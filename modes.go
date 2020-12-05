@@ -28,7 +28,7 @@ func (m normalMode) handleKeyPress(ev keyEvent, resp chan bool) (exit bool) {
 	if ev.k == tcell.KeyCtrlQ {
 		if m.e.modified == false {
 			// Exit the editor
-			// return true
+			return true
 		}
 		m.e.setMode(newQuitWithoutSavingMode(m.e))
 	} else if ev.k == tcell.KeyCtrlW {
