@@ -167,3 +167,55 @@ func TestArrow(t *testing.T) {
 	sendKey(ctx, tcell.KeyUp)
 	expectParams(ctx, 1, 1, 4)
 }
+
+func TestEnter(t *testing.T) {
+	resp := make(chan bool)
+	h, e := initEditor(resp, 3, 3)
+	ctx := context{h: h, resp: resp, t: t, e: e}
+
+	// beginning of document
+	setupScenario(ctx, [][]rune{{}, {'q'}, {'s'}}, 0, 0, 0)
+	sendKey(ctx, tcell.KeyEnter)
+	expectScenario(ctx, [][]rune{{}, {}, {'q'}, {'s'}}, 0, 1, 0)
+
+	// While coding in the middle
+	setupScenario(ctx, [][]rune{{'a'}, {'b'}, {'c'}, {'d'}, {'q'}, {'s'}}, 2, 3, 1)
+	sendKey(ctx, tcell.KeyEnter)
+	expectScenario(ctx, [][]rune{{'a'}, {'b'}, {'c'}, {'d'}, {}, {'q'}, {'s'}}, 2, 4, 0)
+
+	// After last line, v1
+	setupScenario(ctx, [][]rune{{'a'}, {'b'}, {'c', 'q'}, {'q'}, {'s'}}, 0, 2, 2)
+	sendKey(ctx, tcell.KeyEnter)
+	expectScenario(ctx, [][]rune{{'a'}, {'b'}, {'c', 'q'}, {}, {'q'}, {'s'}}, 1, 3, 0)
+
+	// After last line, v2
+	setupScenario(ctx, [][]rune{{'a'}, {'b', 'c', 'q', 'h', 'r'}, {'q'}, {'s'}}, 0, 1, 5)
+	sendKey(ctx, tcell.KeyEnter)
+	expectScenario(ctx, [][]rune{{'a'}, {'b', 'c', 'q', 'h', 'r'}, {}, {'q'}, {'s'}}, 1, 2, 0)
+
+	// Splitting the line. Mid screen, left 1-lines, all visible, no need to jump
+	setupScenario(ctx, [][]rune{{'a', 'b', 'c'}}, 0, 0, 1)
+	sendKey(ctx, tcell.KeyEnter)
+	setupScenario(ctx, [][]rune{{'a'}, {'b', 'c'}}, 0, 1, 0)
+
+	// Splitting the line of long, need to jump
+	setupScenario(ctx, [][]rune{{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'}}, 0, 0, 5)
+	sendKey(ctx, tcell.KeyEnter)
+	setupScenario(ctx, [][]rune{{'a', 'b', 'c', 'd', 'e'}, {'f', 'g', 'h', 'i'}}, 1, 1, 0)
+
+	// Splitting the line of long, need to jump v2
+	setupScenario(ctx, [][]rune{{'a'}, {'a', 'b', 'c', 'd', 'e', 'f'}}, 0, 1, 4)
+	sendKey(ctx, tcell.KeyEnter)
+	setupScenario(ctx, [][]rune{{'a'}, {'a', 'b', 'c', 'd', 'e'}, {'e', 'f'}}, 2, 2, 0)
+
+	// Splitting too long line, above stays short part
+	setupScenario(ctx, [][]rune{{'a'}, {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o'}}, 0, 1, 4)
+	sendKey(ctx, tcell.KeyEnter)
+	setupScenario(ctx, [][]rune{{'a'}, {'a', 'b', 'c', 'd'}, {'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o'}}, 3, 2, 0)
+
+	// Splitting too long line, below stays short part
+	setupScenario(ctx, [][]rune{{'a'}, {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o'}}, 4, 1, 10)
+	sendKey(ctx, tcell.KeyEnter)
+	setupScenario(ctx, [][]rune{{'a'}, {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'}, {'k', 'l', 'm', 'n', 'o'}}, 5, 2, 0)
+
+}

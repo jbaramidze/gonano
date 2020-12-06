@@ -98,6 +98,11 @@ func setupScenario(ctx context, data [][]rune, offsetY, curLine, pos int) {
 	d.recalcBelow(d.data.Front())
 }
 
+func expectScenario(ctx context, data [][]rune, offsetY, curLine, pos int) {
+	expectData(ctx, data)
+	expectParams(ctx, offsetY, curLine, pos)
+}
+
 func expectParams(ctx context, expectY, expectLine, expectPos int) {
 	d := ctx.e.display
 
