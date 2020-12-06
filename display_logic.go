@@ -1,10 +1,9 @@
 package main
 
-func (c *Display) insert(char rune) {
+func oneCharOperation(c *Display, f func()) {
 	oldH := c.getCurrentEl().getOnScreenLineEndingY()
 	oldCursorY := c.getCurrentEl().getRelativeCursorY()
-	c.getCurrentEl().data = insertInSlice(c.getCurrentEl().data, char, c.getCurrentEl().pos)
-	c.getCurrentEl().pos++
+	f()
 	newH := c.getCurrentEl().getOnScreenLineEndingY()
 	newCursorY := c.getCurrentEl().getRelativeCursorY()
 
@@ -19,6 +18,13 @@ func (c *Display) insert(char rune) {
 	}
 }
 
+func (c *Display) insert(char rune) {
+	oneCharOperation(c, func() {
+		c.getCurrentEl().data = insertInSlice(c.getCurrentEl().data, char, c.getCurrentEl().pos)
+		c.getCurrentEl().pos++
+	})
+}
+
 func (c *Display) remove() {
 	if c.getCurrentEl().pos == 0 {
 		if !c.hasPrevEl() {
@@ -27,22 +33,21 @@ func (c *Display) remove() {
 
 		// Remove current line
 		p := c.currentElement.Prev()
-		pl := p.Value.(*Line)
-		pl.data = append(pl.data, c.getCurrentEl().data...)
+		p.Value.(*Line).pos = len(p.Value.(*Line).data)
+		p.Value.(*Line).data = append(p.Value.(*Line).data, c.getCurrentEl().data...)
 		c.data.Remove(c.currentElement)
 		c.currentElement = p
+		c.recalcBelow(c.currentElement)
 
-		c.resyncBelow(c.currentElement)
-	} else {
-		oldHeight := c.getCurrentEl().calculateHeight()
-		c.getCurrentEl().pos--
-		c.getCurrentEl().data = removeFromSlice(c.getCurrentEl().data, c.getCurrentEl().pos)
-		newHeight := c.getCurrentEl().calculateHeight()
-
-		if newHeight != oldHeight {
-			c.resyncBelow(c.currentElement)
-		} else {
-			c.getCurrentEl().resync()
+		// Fix Y!
+		if c.getCurrentEl().getOnScreenCursorY() < 0 {
+			c.offsetY--
 		}
+		c.resyncBelow(c.data.Front())
+	} else {
+		oneCharOperation(c, func() {
+			c.getCurrentEl().pos--
+			c.getCurrentEl().data = removeFromSlice(c.getCurrentEl().data, c.getCurrentEl().pos)
+		})
 	}
 }

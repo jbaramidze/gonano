@@ -217,5 +217,44 @@ func TestEnter(t *testing.T) {
 	setupScenario(ctx, [][]rune{{'a'}, {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o'}}, 4, 1, 10)
 	sendKey(ctx, tcell.KeyEnter)
 	setupScenario(ctx, [][]rune{{'a'}, {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'}, {'k', 'l', 'm', 'n', 'o'}}, 5, 2, 0)
+}
+
+func TestTyping(t *testing.T) {
+	resp := make(chan bool)
+	h, e := initEditor(resp, 3, 3)
+	ctx := context{h: h, resp: resp, t: t, e: e}
+
+	// Only thing to test here is when offsetY changes while typing
+	setupScenario(ctx, [][]rune{{'a'}, {'b'}, {'c', 'd'}}, 0, 2, 2)
+	sendChar(ctx, 'e')
+	expectScenario(ctx, [][]rune{{'a'}, {'b'}, {'c', 'd', 'e'}}, 1, 2, 3)
+}
+
+func TestDel(t *testing.T) {
+	resp := make(chan bool)
+	h, e := initEditor(resp, 3, 3)
+	ctx := context{h: h, resp: resp, t: t, e: e}
+
+	// beginning of document
+	setupScenario(ctx, [][]rune{{}, {'q'}, {'s'}}, 0, 0, 0)
+	sendKey(ctx, tcell.KeyDEL)
+	expectScenario(ctx, [][]rune{{}, {'q'}, {'s'}}, 0, 0, 0)
+
+	// Test deleting characters
+
+	// Normal case
+	setupScenario(ctx, [][]rune{{'t'}, {'q', 's'}}, 0, 1, 2)
+	sendKey(ctx, tcell.KeyDEL)
+	expectScenario(ctx, [][]rune{{'t'}, {'q'}}, 0, 1, 1)
+
+	// Normal case v2
+	setupScenario(ctx, [][]rune{{'t'}, {'q', 's', 'r'}}, 0, 1, 3)
+	sendKey(ctx, tcell.KeyDEL)
+	expectScenario(ctx, [][]rune{{'t'}, {'q', 's'}}, 0, 1, 2)
+
+	// Shift
+	setupScenario(ctx, [][]rune{{'t'}, {'t'}, {'a', 'b', 'c'}}, 3, 2, 3)
+	sendKey(ctx, tcell.KeyDEL)
+	expectScenario(ctx, [][]rune{{'t'}, {'t'}, {'a', 'b'}}, 2, 2, 2)
 
 }
