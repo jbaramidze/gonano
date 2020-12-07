@@ -95,7 +95,7 @@ func setupScenario(ctx context, data [][]rune, offsetY, curLine, pos int) {
 	}
 	d.getCurrentEl().pos = pos
 
-	d.recalcBelow(d.data.Front())
+	d.resyncBelow(d.data.Front())
 }
 
 func validateScreenContent(ctx context) {
@@ -107,12 +107,91 @@ func validateScreenContent(ctx context) {
 			ctx.t.Errorf("Incorrect OffsetY when validating! %v != %v", y, val.startingCoordY)
 			return
 		}
+		y += val.calculateHeight()
 	}
+
+	startingY := ctx.e.display.offsetY
+	line := ctx.e.display.data.Front()
+
+	// Skip lines that end before screen begins
+	for line != nil && line.Value.(*Line).startingCoordY+line.Value.(*Line).calculateHeight()-1 < startingY {
+		line = line.Next()
+	}
+
+	if line == nil {
+		return
+	}
+
+	// Skip wrapped lines insude line before screen begins
+	pos := 0
+	for line.Value.(*Line).startingCoordY+pos/ctx.h.w < startingY && line.Next() != nil {
+		line = line.Next()
+		pos += ctx.h.w
+	}
+
+	i := 0
+	for i < ctx.h.w*ctx.h.w {
+		if line == nil {
+			// make sure it's '@'
+			return
+		}
+		for i < ctx.h.w*ctx.h.w && pos < len(line.Value.(*Line).data) {
+			w := i % ctx.h.w
+			h := i / ctx.h.w
+			if line.Value.(*Line).data[pos] != ctx.h.data[h][w] {
+				ctx.t.Errorf("Byte mismatch when validating! %c != %c w=%v h=%v pos=%v screen: %v line: %v",
+					ctx.h.data[h][w], line.Value.(*Line).data[pos], w, h, pos, ctx.h.data, line.Value.(*Line).data)
+				return
+			}
+			i++
+			pos++
+		}
+
+		if i == ctx.h.w*ctx.h.w {
+			return
+		}
+
+		// If line was empty
+		if len(line.Value.(*Line).data) == 0 {
+			for j := 0; j < ctx.h.w; j, i = j+1, i+1 {
+				if '@' != ctx.h.data[i/ctx.h.w][j] {
+					ctx.t.Errorf("Byte mismatch when validating! %c != @", ctx.h.data[i/ctx.h.w][j])
+					return
+				}
+			}
+			line = line.Next()
+			pos = 0
+			continue
+		}
+
+		// If finished exactly
+		if i%ctx.h.w == 0 {
+			line = line.Next()
+			pos = 0
+			continue
+		}
+
+		// Finalize this line with '@'s
+		remaining := ctx.h.w - i%ctx.h.w
+		for j := 0; j < remaining; j, i = j+1, i+1 {
+			w := i % ctx.h.w
+			h := i / ctx.h.w
+			if '@' != ctx.h.data[h][w] {
+				ctx.t.Errorf("Byte mismatch when validating! %c != @", ctx.h.data[h][w])
+				return
+			}
+		}
+		line = line.Next()
+		pos = 0
+		continue
+	}
+
 }
 
 func expectScenario(ctx context, data [][]rune, offsetY, curLine, pos int) {
 	expectData(ctx, data)
 	expectParams(ctx, offsetY, curLine, pos)
+	validateScreenContent(ctx)
 }
 
 func expectParams(ctx context, expectY, expectLine, expectPos int) {
