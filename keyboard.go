@@ -70,7 +70,7 @@ func (c *Display) handleKeyPress(op typeOperation) {
 			// Create new line
 			newData := make([]rune, len(cur.data)-cur.pos)
 			copy(newData, cur.data[cur.pos:])
-			newItem := Line{data: newData, startingCoordY: cur.startingCoordY + cur.getRelativeCharBeforeCursorY() + 1, height: -1, pos: 0, display: c}
+			newItem := Line{data: newData, startingCoordY: cur.startingCoordY + cur.getRelativeCharBeforeCursorY() + 1, pos: 0, display: c}
 
 			c.data.InsertAfter(&newItem, c.currentElement)
 

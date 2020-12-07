@@ -86,7 +86,7 @@ func setupScenario(ctx context, data [][]rune, offsetY, curLine, pos int) {
 	d := ctx.e.display
 	d.data = list.New()
 	for _, item := range data {
-		d.data.PushBack(&Line{data: item, startingCoordY: 0, height: -1, pos: 0, display: d})
+		d.data.PushBack(&Line{data: item, startingCoordY: 0, pos: 0, display: d})
 	}
 	d.offsetY = offsetY
 	d.currentElement = d.data.Front()
@@ -96,6 +96,18 @@ func setupScenario(ctx context, data [][]rune, offsetY, curLine, pos int) {
 	d.getCurrentEl().pos = pos
 
 	d.recalcBelow(d.data.Front())
+}
+
+func validateScreenContent(ctx context) {
+	// First make sure Ys are calculated correctly
+	y := 0
+	for it := ctx.e.display.data.Front(); it != ctx.e.display.data.Back(); it = it.Next() {
+		val := it.Value.(*Line)
+		if y != val.startingCoordY {
+			ctx.t.Errorf("Incorrect OffsetY when validating! %v != %v", y, val.startingCoordY)
+			return
+		}
+	}
 }
 
 func expectScenario(ctx context, data [][]rune, offsetY, curLine, pos int) {

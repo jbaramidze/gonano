@@ -40,7 +40,7 @@ func (e *Editor) initData(filename string) {
 			e.display.getCurrentEl().data = []rune(field)
 			e.display.getCurrentEl().pos = 0
 		} else {
-			newItem := Line{data: []rune(field), startingCoordY: -1, height: -1, pos: 0, display: e.display}
+			newItem := Line{data: []rune(field), startingCoordY: -1, pos: 0, display: e.display}
 			e.display.data.InsertAfter(&newItem, e.display.currentElement)
 			e.display.currentElement = e.display.currentElement.Next()
 		}

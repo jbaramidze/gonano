@@ -14,9 +14,9 @@ func (c *Display) resyncBelow(from *list.Element) {
 	// Clean at startingY
 	startingY := 0
 	if from != nil {
-		startingY = from.Value.(*Line).startingCoordY + from.Value.(*Line).height
+		startingY = from.Value.(*Line).startingCoordY + from.Value.(*Line).calculateHeight()
 	} else {
-		startingY = c.data.Back().Value.(*Line).startingCoordY + c.data.Back().Value.(*Line).height
+		startingY = c.data.Back().Value.(*Line).startingCoordY + c.data.Back().Value.(*Line).calculateHeight()
 	}
 
 	for ; startingY-c.offsetY < c.getHeight(); startingY++ {
@@ -31,8 +31,7 @@ func (c *Display) recalcBelow(from *list.Element) {
 	for ; from != nil; from = from.Next() {
 		line := from.Value.(*Line)
 		line.startingCoordY = startingY
-		line.height = line.calculateHeight()
-		startingY += line.height
+		startingY += line.calculateHeight()
 	}
 }
 

@@ -23,7 +23,7 @@ func (c *Display) dump() {
 	log.Println("Dumping lines:")
 	for i, e := 0, c.data.Front(); e != nil; i, e = i+1, e.Next() {
 		l := e.Value.(*Line)
-		log.Printf("Line %v: data %v startY %v height %v pos %v", i, string(l.data), l.startingCoordY, l.height, l.pos)
+		log.Printf("Line %v: data %v startY %v height %v pos %v", i, string(l.data), l.startingCoordY, l.calculateHeight(), l.pos)
 	}
 }
 

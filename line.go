@@ -4,7 +4,6 @@ package main
 type Line struct {
 	data           []rune
 	startingCoordY int
-	height         int
 	display        *Display
 	pos            int
 }
@@ -14,7 +13,6 @@ func (c *Display) newLine() *Line {
 		data:           []rune{},
 		startingCoordY: 0,
 		pos:            0,
-		height:         1,
 		display:        c,
 	}
 }
@@ -92,10 +90,9 @@ func (l *Line) resync() {
 			l.display.screen.putStr(i-(line*usableWidth), y, r)
 		}
 	}
-	l.height = line + 1
 	// Clear the rest
 	idx := 0
-	for i := 0; i < l.height; i++ {
+	for i := 0; i < l.calculateHeight(); i++ {
 		for j := 0; j < usableWidth; j++ {
 			idx++
 			if idx <= len(l.data) {
