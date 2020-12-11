@@ -275,4 +275,25 @@ func TestDel(t *testing.T) {
 	sendKey(ctx, tcell.KeyDEL)
 	expectScenario(ctx, [][]rune{{'t'}, {'t', 's', 'l', 'a', 'b', 'c'}}, 2, 1, 3)
 
+	setupScenario(ctx, [][]rune{{'t'}, {'t', 's', 'l'}, {'a', 'b', 'c'}}, 0, 2, 0)
+	sendKey(ctx, tcell.KeyDEL)
+	expectScenario(ctx, [][]rune{{'t'}, {'t', 's', 'l', 'a', 'b', 'c'}}, 0, 1, 3)
+
+	// More advanced connect & shift togethers
+	setupScenario(ctx, [][]rune{{'t'}, {'t', 's', 'l', 'm', 'n'}, {'a'}}, 3, 2, 0)
+	sendKey(ctx, tcell.KeyDEL)
+	expectScenario(ctx, [][]rune{{'t'}, {'t', 's', 'l', 'm', 'n', 'a'}}, 2, 1, 5)
+
+	setupScenario(ctx, [][]rune{{'t'}, {'t', 's', 'l', 'm', 'n'}, {'a'}}, 2, 2, 0)
+	sendKey(ctx, tcell.KeyDEL)
+	expectScenario(ctx, [][]rune{{'t'}, {'t', 's', 'l', 'm', 'n', 'a'}}, 2, 1, 5)
+
+	setupScenario(ctx, [][]rune{{'t'}, {'t', 's', 'l', 'm', 'n'}, {'a', 'b'}}, 3, 2, 0)
+	sendKey(ctx, tcell.KeyDEL)
+	expectScenario(ctx, [][]rune{{'t'}, {'t', 's', 'l', 'm', 'n', 'a', 'b'}}, 2, 1, 5)
+
+	setupScenario(ctx, [][]rune{{'t'}, {'t', 's', 'l', 'm', 'n'}, {'a', 'b', 'c', 'd', 'e', 'f'}}, 3, 2, 0)
+	sendKey(ctx, tcell.KeyDEL)
+	expectScenario(ctx, [][]rune{{'t'}, {'t', 's', 'l', 'm', 'n', 'a', 'b', 'c', 'd', 'e', 'f'}}, 2, 1, 5)
+
 }
