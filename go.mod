@@ -1,4 +1,4 @@
-module github.com/jbaramidze/term_collab_editor
+module github.com/jbaramidze/gonano
 
 go 1.15
 

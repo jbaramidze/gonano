@@ -5,6 +5,13 @@ import (
 	"os"
 )
 
+func printHelp() {
+	fmt.Println("Usage: gonano filename.txt")
+	fmt.Println("Commands:")
+	fmt.Println("Save:\t\tctrl + w")
+	fmt.Println("Exit:\t\tctrl + q")
+}
+
 func main() {
 
 	if len(os.Args) != 2 {
@@ -13,6 +20,11 @@ func main() {
 	}
 
 	arg := os.Args[1]
+
+	if arg == "--help" {
+		printHelp()
+		os.Exit(0)
+	}
 
 	handler := initPhysicalScreenHandler()
 	editor := createEditor(handler)
