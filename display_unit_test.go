@@ -257,4 +257,22 @@ func TestDel(t *testing.T) {
 	sendKey(ctx, tcell.KeyDEL)
 	expectScenario(ctx, [][]rune{{'t'}, {'t'}, {'a', 'b'}}, 2, 2, 2)
 
+	setupScenario(ctx, [][]rune{{'t'}, {'t'}, {'t'}, {'a', 'b', 'c'}}, 2, 3, 3)
+	sendKey(ctx, tcell.KeyDEL)
+	expectScenario(ctx, [][]rune{{'t'}, {'t'}, {'t'}, {'a', 'b'}}, 2, 3, 2)
+
+	// Connect to previous line
+	setupScenario(ctx, [][]rune{{'t'}, {'t'}, {'a', 'b', 'c'}}, 1, 2, 0)
+	sendKey(ctx, tcell.KeyDEL)
+	expectScenario(ctx, [][]rune{{'t'}, {'t', 'a', 'b', 'c'}}, 1, 1, 1)
+
+	// Connect & shift together
+	setupScenario(ctx, [][]rune{{'t'}, {'t'}, {'a', 'b', 'c'}}, 2, 2, 0)
+	sendKey(ctx, tcell.KeyDEL)
+	expectScenario(ctx, [][]rune{{'t'}, {'t', 'a', 'b', 'c'}}, 1, 1, 1)
+
+	setupScenario(ctx, [][]rune{{'t'}, {'t', 's', 'l'}, {'a', 'b', 'c'}}, 2, 2, 0)
+	sendKey(ctx, tcell.KeyDEL)
+	expectScenario(ctx, [][]rune{{'t'}, {'t', 's', 'l', 'a', 'b', 'c'}}, 2, 1, 3)
+
 }

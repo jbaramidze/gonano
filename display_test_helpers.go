@@ -124,8 +124,7 @@ func validateScreenContent(ctx context) {
 
 	// Skip wrapped lines insude line before screen begins
 	pos := 0
-	for line.Value.(*Line).startingCoordY+pos/ctx.h.w < startingY && line.Next() != nil {
-		line = line.Next()
+	for line.Value.(*Line).startingCoordY+pos/ctx.h.w < startingY {
 		pos += ctx.h.w
 	}
 
