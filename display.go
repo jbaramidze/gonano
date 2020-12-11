@@ -20,6 +20,7 @@ type Display struct {
 
 func (c *Display) dump() {
 	log.Printf("Current: x:%v, y:%v", c.getBlinkerX(), c.getBlinkerY())
+	log.Printf("width :%v, height:%v", c.getWidth(), c.getHeight())
 	log.Println("Dumping lines:")
 	for i, e := 0, c.data.Front(); e != nil; i, e = i+1, e.Next() {
 		l := e.Value.(*Line)

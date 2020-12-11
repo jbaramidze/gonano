@@ -34,7 +34,7 @@ func (e *Editor) initData(filename string) {
 		return
 	}
 
-	fields := strings.Fields(string(data))
+	fields := strings.Split(string(data), "\n")
 	for i, field := range fields {
 		if i == 0 {
 			e.display.getCurrentEl().data = []rune(field)
