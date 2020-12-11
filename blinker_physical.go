@@ -17,6 +17,7 @@ func (r *realBlinker) refresh() {
 
 func (r *realBlinker) set() {
 	r.d.screen.putStr(r.d.getBlinkerX(), r.d.getBlinkerY(), rune('▉'))
+	r.d.screen.sync()
 }
 
 func (r *realBlinker) clear() {
@@ -34,6 +35,7 @@ func (r *realBlinker) clear() {
 			r.d.screen.clearStr(r.d.getBlinkerX(), r.d.getBlinkerY())
 		}
 	}
+	r.d.screen.sync()
 }
 
 func initRealBlinker(e *Editor) blinker {

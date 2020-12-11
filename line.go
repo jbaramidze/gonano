@@ -104,4 +104,6 @@ func (l *Line) resync() {
 			}
 		}
 	}
+
+	l.display.screen.sync()
 }

@@ -24,6 +24,7 @@ func (c *Display) resyncBelow(from *list.Element) {
 			c.screen.clearStr(i, startingY-c.offsetY)
 		}
 	}
+	c.screen.sync()
 }
 
 func (c *Display) recalcBelow(from *list.Element) {

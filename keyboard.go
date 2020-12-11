@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/gdamore/tcell"
 )
 
@@ -95,7 +93,6 @@ func (c *Display) handleKeyPress(op typeOperation) {
 		}
 	default:
 		{
-			log.Printf("Key pressed %v (%v)", op.rn, op.key)
 			c.insert(op.rn)
 		}
 	}

@@ -25,4 +25,6 @@ func (s *physicalStatusBar) draw(text []string) {
 		}
 	}
 
+	s.d.screen.sync()
+
 }

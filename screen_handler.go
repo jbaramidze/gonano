@@ -8,6 +8,7 @@ type screenHandler interface {
 	getSize() (int, int)
 	pollKeyPress() interface{}
 	close()
+	sync()
 }
 
 type keyEvent struct {

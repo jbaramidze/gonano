@@ -15,9 +15,12 @@ func (s *physicalScreenHandler) close() {
 	s.screen.Fini()
 }
 
+func (s *physicalScreenHandler) sync() {
+	s.screen.Show()
+}
+
 func (s *physicalScreenHandler) putStr(x, y int, b rune) {
 	s.screen.SetContent(x, y, b, []rune{}, tcell.StyleDefault)
-	s.screen.Show()
 }
 func (s *physicalScreenHandler) clearStr(x, y int) {
 	s.putStr(x, y, 0)
